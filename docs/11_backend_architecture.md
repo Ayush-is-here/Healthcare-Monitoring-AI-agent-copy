@@ -40,9 +40,9 @@ backend/
 │   ├── tools/                  # Individual AI tools
 │   │
 │   ├── database/
-│   │   ├── session.py
-│   │   ├── base.py
-│   │   └── seed.py
+│   │   ├── session.py          # Session factory  dependency
+│   │   ├── base.py             # Base class for all models
+│   │   └── engine.py.py        # Database engine
 │   │
 │   ├── integrations/           # Google Fit, Fitbit, etc.
 │   │
