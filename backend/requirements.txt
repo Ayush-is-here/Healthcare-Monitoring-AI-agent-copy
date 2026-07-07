@@ -1,0 +1,47 @@
+# ==========================
+# Web Framework
+# ==========================
+fastapi
+uvicorn[standard]
+
+# ==========================
+# Database
+# ==========================
+sqlalchemy
+alembic
+psycopg[binary]
+
+# ==========================
+# Configuration
+# ==========================
+python-dotenv
+pydantic-settings
+
+# ==========================
+# Authentication & Security
+# ==========================
+passlib[bcrypt]
+python-jose[cryptography]
+
+# ==========================
+# AI Agent
+# ==========================
+langgraph
+langchain
+langchain-google-genai
+
+# ==========================
+# Background Tasks
+# ==========================
+redis
+celery
+
+# ==========================
+# HTTP Client
+# ==========================
+httpx
+
+# ==========================
+# Testing
+# ==========================
+pytest
