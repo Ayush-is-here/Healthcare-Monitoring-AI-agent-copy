@@ -16,11 +16,13 @@ psycopg[binary]
 # ==========================
 python-dotenv
 pydantic-settings
+pydantic[email]
 
 # ==========================
 # Authentication & Security
 # ==========================
 passlib[bcrypt]
+bcrypt==4.0.1
 python-jose[cryptography]
 
 # ==========================
