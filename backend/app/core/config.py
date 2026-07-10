@@ -3,6 +3,9 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     app_name: str = "Healthcare Monitoring AI platform"
     database_url: str
+    secret_key: str
+    access_token_expire_minutes: int
+    jwt_algorithm: str
 
     model_config = SettingsConfigDict(
         env_file=".env",
