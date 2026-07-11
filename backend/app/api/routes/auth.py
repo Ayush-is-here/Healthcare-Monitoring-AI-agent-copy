@@ -1,11 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from app.schemas.user import RegisterRequest, RegisterResponse, LoginRequest, LoginResponse
+from fastapi.security import OAuth2PasswordRequestForm
+from app.schemas.user import RegisterRequest, RegisterResponse, LoginResponse, UserResponse
 from app.database.session import get_db
 from sqlalchemy.orm import Session
 from app.models.user import User
 from sqlalchemy import select
 from app.core.security import hash_password, verify_password
-from app.core.security import create_access_token
+from app.core.security import create_access_token, get_current_user
 
 router = APIRouter()
 
@@ -39,8 +40,9 @@ def register(user: RegisterRequest, db: Session = Depends(get_db)):
     return new_user
 
 @router.post("/login", response_model=LoginResponse)
-def login(user: LoginRequest, db: Session = Depends(get_db)):
-    query = select(User).where(User.email == user.email)
+def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    print("New Login Endpoint is Running")
+    query = select(User).where(User.email == form_data.username)
     result = db.execute(query)
     existing_user = result.scalar_one_or_none()
 
@@ -48,7 +50,7 @@ def login(user: LoginRequest, db: Session = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                             detail="Invalid email or password")
     
-    is_valid = verify_password(user.password, existing_user.password_hash)
+    is_valid = verify_password(form_data.password, existing_user.password_hash)
 
     if not is_valid:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
@@ -62,3 +64,7 @@ def login(user: LoginRequest, db: Session = Depends(get_db)):
         "access_token": access_token,
         "token_type": "bearer"
     }
+
+@router.get("/me", response_model=UserResponse)
+def get_me(current_user: User =Depends(get_current_user)):
+    return current_user

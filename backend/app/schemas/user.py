@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
 from uuid import UUID
 from app.models.enum import UserRole
 
@@ -21,3 +21,12 @@ class LoginRequest(BaseModel):
 class LoginResponse(BaseModel):
     access_token: str
     token_type: str
+
+class UserResponse(BaseModel):
+    id: UUID
+    name: str
+    email: EmailStr
+    phone: str | None
+    role: UserRole
+
+    model_config = ConfigDict(from_attributes=True)
