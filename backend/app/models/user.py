@@ -1,6 +1,7 @@
+from __future__ import annotations
 from app.database.base import Base
-from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy import UUID, String, Enum
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import String, Enum
 import uuid 
 from app.models.enum import UserRole
 from datetime import datetime
@@ -50,4 +51,11 @@ class User(Base):
         default= datetime.now,
         onupdate=datetime.now,
         nullable=False
+    )
+
+    patient_profile: Mapped[PatientProfile] = relationship(
+        "PatientProfile",
+        back_populates="user",
+        uselist=False,
+        cascade="all, delete-orphan"
     )

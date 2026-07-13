@@ -1,5 +1,5 @@
 from app.database.base import Base
-from app.models.user import User
+import app.models
 
 from logging.config import fileConfig
 

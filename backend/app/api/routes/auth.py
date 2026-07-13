@@ -41,7 +41,6 @@ def register(user: RegisterRequest, db: Session = Depends(get_db)):
 
 @router.post("/login", response_model=LoginResponse)
 def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
-    print("New Login Endpoint is Running")
     query = select(User).where(User.email == form_data.username)
     result = db.execute(query)
     existing_user = result.scalar_one_or_none()

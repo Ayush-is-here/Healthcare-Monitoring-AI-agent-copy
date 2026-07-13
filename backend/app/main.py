@@ -1,9 +1,11 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
+from app.models import *
 from sqlalchemy import text
 from app.core.config import settings
 from app.database.engine import engine
-from app.api.routes.auth import router
+from app.api.routes import auth
+from app.api.routes import profile
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -24,7 +26,8 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-app.include_router(router)
+app.include_router(auth.router)
+app.include_router(profile.router)
 
 
 @app.get("/")
