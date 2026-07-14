@@ -7,6 +7,8 @@ from app.models.user import User
 from sqlalchemy import select
 from app.core.security import hash_password, verify_password
 from app.core.security import create_access_token, get_current_user
+from app.core.permissions import require_roles
+from app.models.enum import UserRole
 
 router = APIRouter()
 
@@ -30,7 +32,8 @@ def register(user: RegisterRequest, db: Session = Depends(get_db)):
     new_user = User(
         name = user.name,
         email = user.email,
-        password_hash = hashed_password
+        password_hash = hashed_password,
+        role=user.role
     )
 
     db.add(new_user)
@@ -67,3 +70,4 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
 @router.get("/me", response_model=UserResponse)
 def get_me(current_user: User =Depends(get_current_user)):
     return current_user
+

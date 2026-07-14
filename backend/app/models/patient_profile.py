@@ -92,3 +92,9 @@ class PatientProfile(Base):
         "User",
         back_populates="patient_profile"
     )
+
+    health_metrics: Mapped["HealthMetric"] = relationship(
+        "HealthMetric",
+        back_populates="patient_profile",
+        cascade="all, delete-orphan"
+    )

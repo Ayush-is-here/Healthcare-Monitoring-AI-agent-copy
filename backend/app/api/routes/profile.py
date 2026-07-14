@@ -14,9 +14,9 @@ router = APIRouter(
 @router.patch("/", response_model=PatientProfileResponse)
 def update_profile(
     profile_data: PatientProfileUpdate,
-                   current_user: User = Depends(get_current_user),
-                   db: Session = Depends(get_db)
-                   ):
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+    ):
     return ProfileService.update_profile(
         db=db,
         user_id=current_user.id,
