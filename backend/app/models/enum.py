@@ -56,3 +56,21 @@ class MetricSource(str, Enum):
     GOOGLE_HEALTH = "google_health"
     FITBIT = "fitbit"
     
+class MedicationFrequency(str, Enum):
+    ONCE_DAILY = "once_daily"
+    TWICE_DAILY = "twice_daily"
+    THREE_TIMES_DAILY = "three_times_daily"
+    FOUR_TIMES_DAILY = "four_times_daily"
+    EVERY_OTHER_DAY = "every_other_day"
+    WEEKLY = "weekly"
+    AS_NEEDED = "as_needed"
+
+class DosageUnit(str, Enum):
+    MG = "mg"
+    G = "g"
+    ML = "ml"
+    TABLET = "tablet"
+    CAPSULE = "capsule"
+    DROP = "drop"
+    PUFF = "puff"
+    UNIT = "unit"

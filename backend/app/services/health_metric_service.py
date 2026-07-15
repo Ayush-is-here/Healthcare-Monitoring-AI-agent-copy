@@ -97,6 +97,8 @@ class HealthMetricService:
                 health_metric=health_metric,
                 metric_data=metric_data
             )
+    
+    
     @staticmethod
     def delete(
         db: Session,

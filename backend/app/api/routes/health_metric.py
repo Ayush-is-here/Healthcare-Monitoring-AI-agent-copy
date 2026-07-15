@@ -51,13 +51,12 @@ def create(
         metric_data=metric_data
     )
 
-@router.delete("/{metric_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{metric_id}", status_code=status.HTTP_200_OK)
 def delete(
     metric_id: UUID,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
-
-):
+    ):
     
     HealthMetricService.delete(
         db=db,

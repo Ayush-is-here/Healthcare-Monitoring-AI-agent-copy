@@ -10,6 +10,7 @@ from app.core.exception_handler import http_exception_handler, validation_except
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from fastapi.exceptions import RequestValidationError
 from app.api.routes import health_metric
+from app.api.routes import medication
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -36,6 +37,7 @@ app.add_exception_handler(Exception, general_exception_handler)
 app.include_router(auth.router)
 app.include_router(profile.router)
 app.include_router(health_metric.router)
+app.include_router(medication.router)
 
 
 @app.get("/")
