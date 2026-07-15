@@ -93,14 +93,20 @@ class PatientProfile(Base):
         back_populates="patient_profile"
     )
 
-    health_metrics: Mapped["HealthMetric"] = relationship(
+    health_metrics: Mapped[list["HealthMetric"]] = relationship(
         "HealthMetric",
         back_populates="patient_profile",
         cascade="all, delete-orphan"
     )
 
-    medications: Mapped["Medication"] = relationship(
+    medications: Mapped[list["Medication"]] = relationship(
         "Medication",
+        back_populates="patient_profile",
+        cascade="all, delete-orphan"
+    )
+
+    appointments: Mapped[list["Appointment"]] = relationship(
+        "Appointment",
         back_populates="patient_profile",
         cascade="all, delete-orphan"
     )

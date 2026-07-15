@@ -2,7 +2,8 @@ from fastapi import APIRouter, status, Depends
 from app.schemas.medication import MedicationResponse, MedicationUpdate, MedicationCreate
 from sqlalchemy.orm import Session
 from uuid import UUID
-from app.core.security import get_current_user, get_db
+from app.core.security import get_current_user
+from app.database.session import get_db
 from app.services.medication_service import MedicationService
 from app.models.user import User
 

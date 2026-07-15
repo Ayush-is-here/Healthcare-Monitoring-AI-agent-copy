@@ -51,7 +51,7 @@ class MedicationRepository:
         db: Session,
         medication: Medication,
         medication_data: MedicationUpdate
-    ) -> Medication:
+    ) -> Medication :
         
         update_data = medication_data.model_dump(exclude_unset=True)
 

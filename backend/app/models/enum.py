@@ -74,3 +74,9 @@ class DosageUnit(str, Enum):
     DROP = "drop"
     PUFF = "puff"
     UNIT = "unit"
+
+class AppointmentStatus(Enum):
+    SCHEDULED = "scheduled"
+    PENDING = "pending"
+    COMPLETED = "completed"
+    CANCELLED = "cancelled"
