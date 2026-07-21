@@ -43,6 +43,7 @@ celery
 # HTTP Client
 # ==========================
 httpx
+resend
 
 # ==========================
 # Testing

@@ -13,6 +13,7 @@ from app.api.routes import health_metric
 from app.api.routes import medication
 from app.api.routes import appointment
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     try:
@@ -48,3 +49,6 @@ def root():
         "message": "Healthcare Monitoring AI platform is running!",
         "status": "healthy"
         }
+
+
+

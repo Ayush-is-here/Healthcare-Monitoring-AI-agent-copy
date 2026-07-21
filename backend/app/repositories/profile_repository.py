@@ -10,13 +10,25 @@ from app.schemas.patient_profile import PatientProfileCreate
 class ProfileRepository:
 
     @staticmethod
+    def get_by_id(
+        db: Session,
+        patient_profile_id: UUID
+    ) -> PatientProfile:
+        
+        return db.scalars(
+            select(PatientProfile).where(PatientProfile.id==patient_profile_id)
+        ).one_or_none()
+
+
+
+    @staticmethod
     def get_by_user_id(
         db: Session,
         user_id: UUID,
     ) -> PatientProfile | None:
-        patient_profile = db.scalar(
+        patient_profile = db.scalars(
             select(PatientProfile).where(PatientProfile.user_id == user_id)
-        )
+        ).one_or_none()
 
         return patient_profile
     

@@ -69,3 +69,9 @@ class Medication(Base):
         "PatientProfile",
         back_populates="medications"
     )
+
+    medication_reminders: Mapped[list["MedicationReminder"]] = relationship(
+        "MedicationReminder",
+        back_populates="medication",
+        cascade="all, delete-orphan"
+    )

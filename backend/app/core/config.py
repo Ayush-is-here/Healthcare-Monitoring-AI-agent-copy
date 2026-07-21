@@ -6,6 +6,9 @@ class Settings(BaseSettings):
     secret_key: str
     access_token_expire_minutes: int
     jwt_algorithm: str
+    redis_url: str
+    resend_api_key: str
+    notification_sender_email: str
 
     model_config = SettingsConfigDict(
         env_file=".env",

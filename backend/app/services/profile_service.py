@@ -7,6 +7,7 @@ from app.repositories.profile_repository import ProfileRepository
 
 class ProfileService:
 
+
     @staticmethod
     def update_profile(
         db: Session,
