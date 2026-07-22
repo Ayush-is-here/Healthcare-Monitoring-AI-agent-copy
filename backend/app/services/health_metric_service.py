@@ -19,7 +19,7 @@ class HealthMetricService:
             db=db,
             user_id=user_id
         )
-
+        
         if patient_profile is None:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
