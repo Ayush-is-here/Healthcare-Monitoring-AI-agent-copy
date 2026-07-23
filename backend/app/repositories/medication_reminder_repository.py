@@ -6,6 +6,8 @@ from app.dto.notification_dto import MedicationReminderNotificationDTO
 from app.models.user import User
 from app.models.medication import Medication
 from app.models.patient_profile import PatientProfile
+from app.schemas.medication_reminder import MedicationReminderCreate, MedicationReminderUpdate
+from uuid import UUID
 
 
 class MedicationReminderRepository:
@@ -51,3 +53,67 @@ class MedicationReminderRepository:
             )
             for row in rows
         ]
+
+    @staticmethod
+    def create(
+        db: Session,
+        medication_reminder_data: MedicationReminderCreate
+    ) -> MedicationReminder:
+
+        medication_reminder = MedicationReminder(
+            **medication_reminder_data.model_dump()
+        )
+
+        db.add(medication_reminder)
+        db.commit()
+        db.refresh(medication_reminder)
+
+        return medication_reminder
+
+    @staticmethod
+    def list_by_medication_id(
+        db: Session,
+        medication_id: UUID
+    ) -> list[MedicationReminder]:
+
+        return db.scalars(
+            select(MedicationReminder).where(MedicationReminder.medication_id == medication_id).
+            order_by(MedicationReminder.created_at.desc())
+        ).all()
+
+    @staticmethod
+    def get_by_id(
+        db:Session,
+        medication_reminder_id: UUID
+    ) -> MedicationReminder | None :
+
+        return db.scalars(
+            select(MedicationReminder).where(MedicationReminder.id == medication_reminder_id)
+        ).one_or_none()
+
+
+    @staticmethod
+    def update(
+        db: Session,
+        medication_reminder: MedicationReminder,
+        medication_reminder_data: MedicationReminderUpdate
+    ) -> MedicationReminder:
+
+        update_data = medication_reminder_data.model_dump(exclude_unset=True)
+        
+
+        for key, value in update_data.items():
+            setattr(medication_reminder, key, value)
+
+        db.commit()
+        db.refresh(medication_reminder)
+
+        return medication_reminder
+
+    @staticmethod
+    def delete(
+        db: Session,
+        medication_reminder: MedicationReminder
+    ) -> None:
+        db.delete(medication_reminder)
+        db.commit()

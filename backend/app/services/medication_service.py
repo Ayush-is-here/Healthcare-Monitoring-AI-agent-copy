@@ -127,7 +127,7 @@ class MedicationService:
                 detail="You are not allowed to modify this medication."
                 )
 
-        return MedicationRepository.delete(
+        MedicationRepository.delete(
             db=db,
             medication=medication
         )

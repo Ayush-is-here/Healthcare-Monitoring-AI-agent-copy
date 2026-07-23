@@ -12,7 +12,7 @@ from fastapi.exceptions import RequestValidationError
 from app.api.routes import health_metric
 from app.api.routes import medication
 from app.api.routes import appointment
-
+from app.api.routes import medication_reminder
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -41,6 +41,7 @@ app.include_router(profile.router)
 app.include_router(health_metric.router)
 app.include_router(medication.router)
 app.include_router(appointment.router)
+app.include_router(medication_reminder.router)
 
 
 @app.get("/")
