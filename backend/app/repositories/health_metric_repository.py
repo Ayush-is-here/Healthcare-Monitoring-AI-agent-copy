@@ -1,13 +1,72 @@
 from uuid import UUID
 
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.orm import Session
 
 from app.models.health_metric import HealthMetric
 from app.schemas.health_metric import HealthMetricCreate, HealthMetricUpdate
 
+from datetime import datetime
+from app.models.enum import MetricType
+
 
 class HealthMetricRepository:
+
+    @staticmethod
+    def get_latest_metrics(
+        db: Session,
+        patient_profile_id: UUID
+    ) -> list[HealthMetric]:
+
+        latest_metric = (
+            select(
+                HealthMetric.metric_type,
+                func.max(HealthMetric.recorded_at).label("latest_recorded_at")
+            )
+            .where(
+            HealthMetric.patient_profile_id == patient_profile_id
+            )
+            .group_by(
+                HealthMetric.metric_type
+            )
+            .subquery()
+            )
+
+        return db.scalars(
+            select(HealthMetric)
+            .join(
+                latest_metric,
+                (HealthMetric.metric_type == latest_metric.c.metric_type)
+                &
+                (HealthMetric.recorded_at == latest_metric.c.latest_recorded_at)
+            )
+            .where(
+                HealthMetric.patient_profile_id == patient_profile_id
+            )
+            .order_by(
+                HealthMetric.metric_type
+            )
+            ).all()
+
+    @staticmethod
+    def get_metrics_since(
+        db: Session,
+        patient_profile_id: UUID,
+        since: datetime
+    ) -> list[HealthMetric]:
+
+        return db.scalars(
+                select(HealthMetric)
+                .where(
+                    HealthMetric.patient_profile_id == patient_profile_id,
+                    HealthMetric.recorded_at >= since
+                )
+                .order_by(
+                    HealthMetric.recorded_at.desc()
+                )
+            ).all()
+
+
     @staticmethod
     def create(
             db: Session,

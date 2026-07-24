@@ -2,9 +2,77 @@ from sqlalchemy.orm import Session
 from uuid import UUID
 from app.models.appointment import Appointment
 from app.schemas.appointment import AppointmentCreate, AppointmentUpdate
-from sqlalchemy import select
+from sqlalchemy import select, func
+from datetime import date, datetime
+from app.models.enum import AppointmentStatus
 
 class AppointmentRepository:
+
+    @staticmethod
+    def get_upcoming_appointments(
+        db: Session,
+        patient_profile_id: UUID
+    ) -> Appointment | None:
+
+        today_date = datetime.now().date()
+        current_time = datetime.now().time()
+
+        return db.scalar(
+            select(Appointment).
+            where(
+                Appointment.patient_profile_id == patient_profile_id,
+                Appointment.status.in_(
+                    [
+                        AppointmentStatus.SCHEDULED,
+                        AppointmentStatus.PENDING
+                    ]
+                ),
+                (Appointment.appointment_date > today_date) |
+                (
+                    (Appointment.appointment_date == today_date)  &
+                    (Appointment.appointment_time >= current_time)
+                )
+            )
+            .order_by(
+                Appointment.appointment_date.asc(),
+                Appointment.appointment_time.asc()
+            )
+            .limit(1)
+        )
+
+    @staticmethod
+    def count_upcoming(
+        db: Session,
+        patient_profile_id: UUID
+    ) -> int :
+
+        today_date = datetime.now().date()
+        current_time = datetime.now().time()
+
+        return db.scalar(
+            select(func.count())
+            .select_from(Appointment)
+            .where(
+                Appointment.patient_profile_id == patient_profile_id,
+                Appointment.status.in_(
+                    [
+                        AppointmentStatus.SCHEDULED,
+                        AppointmentStatus.PENDING
+                    ]
+                ),
+                (Appointment.appointment_date > today_date)
+                |
+                (
+                    (Appointment.appointment_date == today_date)
+                    &
+                    (Appointment.appointment_time >= current_time)
+                )
+            )
+        ) or 0
+
+        
+
+
 
     @staticmethod
     def create(

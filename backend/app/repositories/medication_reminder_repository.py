@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
-from datetime import time
-from sqlalchemy import select
+from datetime import time, date
+from sqlalchemy import select, func
 from app.models.medication_reminder import MedicationReminder
 from app.dto.notification_dto import MedicationReminderNotificationDTO
 from app.models.user import User
@@ -53,6 +53,29 @@ class MedicationReminderRepository:
             )
             for row in rows
         ]
+
+    @staticmethod
+    def count_due_today(
+        db: Session,
+        patient_profile_id: UUID
+    ) -> int:
+
+        return db.scalar(
+        select(func.count())
+        .select_from(MedicationReminder)
+        .join(
+            Medication,
+            Medication.id == MedicationReminder.medication_id
+        )
+        .where(
+            Medication.patient_profile_id == patient_profile_id,
+            MedicationReminder.is_active == True
+        )
+    ) or 0
+
+
+
+    
 
     @staticmethod
     def create(
