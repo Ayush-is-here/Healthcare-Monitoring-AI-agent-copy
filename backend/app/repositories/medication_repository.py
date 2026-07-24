@@ -2,10 +2,27 @@ from sqlalchemy.orm import Session
 from uuid import UUID
 from app.schemas.medication import MedicationCreate, MedicationUpdate
 from app.models.medication import Medication
-from sqlalchemy import select
+from sqlalchemy import select, func
 
 
 class MedicationRepository:
+
+    @staticmethod
+    def count_active_by_patient_profile(
+        db: Session,
+        patient_profile_id: UUID
+    ) -> int:
+
+        return db.scalar(
+        select(func.count())
+        .select_from(Medication)
+        .where(
+            Medication.patient_profile_id == patient_profile_id,
+            Medication.is_active == True
+            )
+        ) or 0
+
+
 
     @staticmethod
     def create(
