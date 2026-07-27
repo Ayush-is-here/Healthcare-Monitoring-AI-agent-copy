@@ -36,6 +36,11 @@ class PatientProfile(Base):
         nullable=False
     )
 
+    weight_kg: Mapped[float] = mapped_column(
+        Float,
+        nullable=False
+    )
+
     blood_group: Mapped[BloodGroup] = mapped_column(
         Enum(BloodGroup),
         nullable=False
