@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     redis_url: str
     resend_api_key: str
     notification_sender_email: str
+    gemini_api_key: str
 
     model_config = SettingsConfigDict(
         env_file=".env",

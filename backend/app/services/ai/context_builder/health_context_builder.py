@@ -1,13 +1,13 @@
 from app.models.patient_profile import PatientProfile
 from app.schemas.ai.health_context import HealthContext
-from backend.app.services.ai.context_builder.patient_context_builder import PatientContextBuilder
+from app.services.ai.context_builder.patient_context_builder import PatientContextBuilder
 from app.models.medication import Medication
 from app.models.appointment import Appointment
 from app.models.health_metric import HealthMetric
 
-from backend.app.services.ai.context_builder.medication_context_builder import MedicationContextBuilder
-from backend.app.services.ai.context_builder.appointment_context_builder import AppointmentContextBuilder
-from backend.app.services.ai.context_builder.metric_context_builder import MetricContextBuilder
+from app.services.ai.context_builder.medication_context_builder import MedicationContextBuilder
+from app.services.ai.context_builder.appointment_context_builder import AppointmentContextBuilder
+from app.services.ai.context_builder.metric_context_builder import MetricContextBuilder
 
 from datetime import datetime, UTC
 

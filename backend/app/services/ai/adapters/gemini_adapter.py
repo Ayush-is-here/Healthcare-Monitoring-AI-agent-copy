@@ -1,0 +1,35 @@
+from app.services.ai.adapters.base_ai_adapter import BaseAIAdapter
+from app.core.config import settings
+from google import genai
+from google.genai.types import GenerateContentConfig
+
+
+class GeminiAdapter(BaseAIAdapter):
+
+    def __init__(self):
+        api_key = settings.gemini_api_key
+
+        self.client = genai.Client(api_key=api_key)
+        self.model = "gemini-3.1-flash-lite"
+
+    def generate(
+        self,
+        system_instruction: str,
+        user_prompt: str
+    ) -> str:
+
+        response = self.client.models.generate_content(
+            model=self.model,
+            contents=user_prompt,
+
+            config=GenerateContentConfig(
+                system_instruction=system_instruction,
+                temperature=0.2
+            )
+        )
+
+
+
+#add try except for api response if none
+
+        return response.text

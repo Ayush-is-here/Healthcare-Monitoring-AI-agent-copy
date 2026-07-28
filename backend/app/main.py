@@ -14,6 +14,8 @@ from app.api.routes import medication
 from app.api.routes import appointment
 from app.api.routes import medication_reminder
 from app.api.routes import dashboard
+from app.api.routes.ai import health_insight
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -44,6 +46,7 @@ app.include_router(medication.router)
 app.include_router(appointment.router)
 app.include_router(medication_reminder.router)
 app.include_router(dashboard.router)
+app.include_router(health_insight.router)
 
 
 @app.get("/")
