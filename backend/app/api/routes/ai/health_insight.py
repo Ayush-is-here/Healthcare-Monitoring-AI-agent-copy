@@ -6,8 +6,7 @@ from sqlalchemy.orm import Session
 from app.services.ai.health_insight_service import HealthInsightService
 from app.services.ai.health_context_service import HealthContextService
 from app.schemas.ai.health_insight_response import HealthInsightResponse
-from app.services.ai.adapters.gemini_adapter import GeminiAdapter
-
+from app.dependencies.ai import get_health_insight_service
 
 
 router = APIRouter(
@@ -19,8 +18,9 @@ router = APIRouter(
 @router.post("/health-insights",response_model=HealthInsightResponse)
 def get_health_insights(
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
-) :
+    current_user: User = Depends(get_current_user),
+    health_insight_service: HealthInsightService = Depends(get_health_insight_service)
+    ) -> HealthInsightResponse :
 
     patient_profile = ProfileRepository.get_by_user_id(
         db=db,
@@ -36,12 +36,6 @@ def get_health_insights(
     health_context = HealthContextService.build(
         db=db,
         patient_profile_id=patient_profile.id
-    )
-
-    ai_adapter = GeminiAdapter()
-
-    health_insight_service = HealthInsightService(
-        ai_adapter=ai_adapter
     )
 
     return health_insight_service.get_health_insight(

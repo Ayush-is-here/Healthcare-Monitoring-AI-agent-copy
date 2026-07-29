@@ -6,7 +6,7 @@ from app.core.config import settings
 from app.database.engine import engine
 from app.api.routes import auth
 from app.api.routes import profile
-from app.core.exception_handler import http_exception_handler, validation_exception_handler, general_exception_handler
+from app.core.exceptions.exception_handler import http_exception_handler, validation_exception_handler, general_exception_handler
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from fastapi.exceptions import RequestValidationError
 from app.api.routes import health_metric
@@ -15,6 +15,8 @@ from app.api.routes import appointment
 from app.api.routes import medication_reminder
 from app.api.routes import dashboard
 from app.api.routes.ai import health_insight
+from app.core.exceptions.ai import *
+from app.core.exceptions.exception_handler import ai__exception_handler
 
 
 @asynccontextmanager
@@ -38,6 +40,9 @@ app = FastAPI(
 
 app.add_exception_handler(StarletteHTTPException, http_exception_handler)
 app.add_exception_handler(RequestValidationError, validation_exception_handler)
+app.add_exception_handler(AIProviderException, ai__exception_handler)
+app.add_exception_handler(AIResponseParsingException, ai__exception_handler)
+app.add_exception_handler(AIValidationException, ai__exception_handler)
 app.add_exception_handler(Exception, general_exception_handler)
 app.include_router(auth.router)
 app.include_router(profile.router)

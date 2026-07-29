@@ -2,7 +2,7 @@ from app.services.ai.adapters.base_ai_adapter import BaseAIAdapter
 from app.core.config import settings
 from google import genai
 from google.genai.types import GenerateContentConfig
-
+from app.core.exceptions.ai import AIProviderException
 
 class GeminiAdapter(BaseAIAdapter):
 
@@ -18,18 +18,19 @@ class GeminiAdapter(BaseAIAdapter):
         user_prompt: str
     ) -> str:
 
-        response = self.client.models.generate_content(
-            model=self.model,
-            contents=user_prompt,
+        try:
+            response = self.client.models.generate_content(
+                model=self.model,
+                contents=user_prompt,
 
-            config=GenerateContentConfig(
-                system_instruction=system_instruction,
-                temperature=0.2
+                config=GenerateContentConfig(
+                    system_instruction=system_instruction,
+                    temperature=0.2
+                )
             )
-        )
+            return response.text
 
-
-
-#add try except for api response if none
-
-        return response.text
+        except Exception as e:
+            raise AIProviderException(
+                "Failed to communicate with LLM provider."
+            ) from e

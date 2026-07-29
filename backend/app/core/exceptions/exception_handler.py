@@ -3,6 +3,7 @@ from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from fastapi import status
+from app.core.exceptions.ai import  *
 
 async def http_exception_handler(
         request: Request,
@@ -45,6 +46,23 @@ async def general_exception_handler(
             "error": {
                 "status_code": status.HTTP_500_INTERNAL_SERVER_ERROR,
                 "message": "Internal server error"
+            }
+        }
+    )
+
+
+async def ai__exception_handler(
+        request: Request,
+        exc: Exception
+        ):
+
+    return JSONResponse(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        content={
+            "success": False,
+            "error": {
+                "status_code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+                "message": str(exc)
             }
         }
     )

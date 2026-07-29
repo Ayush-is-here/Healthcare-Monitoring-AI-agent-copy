@@ -5,8 +5,9 @@ from app.services.ai.prompt.system_instruction import SystemInstruction
 from app.services.ai.prompt.prompt_builder import PromptBuilder
 import json
 from app.schemas.ai.health_insight_response import HealthInsightResponse
-
-
+from json import JSONDecodeError
+from app.core.exceptions.ai import *
+from pydantic import ValidationError
 
 class HealthInsightService:
 
@@ -37,10 +38,22 @@ class HealthInsightService:
             user_prompt=user_prompt
         )
 
-        parsed_response = json.loads(response)
+        try:
+            parsed_response = json.loads(response)
 
-        health_insight = HealthInsightResponse.model_validate(
-            parsed_response
-        )
+        except JSONDecodeError as e:
+            raise AIResponseParsingException(
+                "AI returned invalid JSON."
+            ) from e
+
+        try:
+            health_insight = HealthInsightResponse.model_validate(
+                parsed_response
+            )
+
+        except ValidationError as e:
+            raise AIValidationException(
+                "AI response validation failed."
+            ) from e
 
         return health_insight
