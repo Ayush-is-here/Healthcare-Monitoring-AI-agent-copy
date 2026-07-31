@@ -3,6 +3,7 @@ from app.core.config import settings
 from google import genai
 from google.genai.types import GenerateContentConfig
 from app.core.exceptions.ai import AIProviderException
+from app.schemas.ai.health_insight_response import HealthInsightResponse
 
 class GeminiAdapter(BaseAIAdapter):
 
@@ -25,7 +26,11 @@ class GeminiAdapter(BaseAIAdapter):
 
                 config=GenerateContentConfig(
                     system_instruction=system_instruction,
-                    temperature=0.2
+                    temperature=0.2,
+
+                    #
+                    response_mime_type="application/json",
+                    response_schema=HealthInsightResponse
                 )
             )
             return response.text

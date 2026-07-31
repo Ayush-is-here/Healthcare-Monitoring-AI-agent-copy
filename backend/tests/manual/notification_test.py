@@ -1,5 +1,5 @@
 from app.dependencies.notification import get_notification_service
-from app.dto.notification_dto import MedicationReminderNotificationDTO
+from backend.app.dto.notification.medication_reminder_notification import MedicationReminderNotificationDTO
 from app.core.enums.notification_type import NotificationType
 
 notification = MedicationReminderNotificationDTO(
@@ -14,6 +14,6 @@ notification = MedicationReminderNotificationDTO(
 
 notification_service = get_notification_service()
 
-notification_service.send_medication_reminder(
+notification_service.send(
     notification=notification
 )

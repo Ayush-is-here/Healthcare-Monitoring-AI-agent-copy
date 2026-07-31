@@ -1,7 +1,7 @@
 from app.database.session import SessionLocal
 from app.repositories.medication_reminder_repository import MedicationReminderRepository
 from datetime import datetime
-from app.dto.notification_dto import MedicationReminderNotificationDTO
+from backend.app.dto.notification.medication_reminder_notification import MedicationReminderNotificationDTO
 from app.dependencies.notification import get_notification_service
 
 
@@ -25,8 +25,9 @@ def process_due_reminders():
         for notification in notifications:
             notification: MedicationReminderNotificationDTO
 
-            notification_service.send_medication_reminder(
+            notification_service.send(
                 notification=notification
             )
+            
     finally:
         db.close()

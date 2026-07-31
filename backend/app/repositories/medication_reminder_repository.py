@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from datetime import time, date
 from sqlalchemy import select, func
 from app.models.medication_reminder import MedicationReminder
-from app.dto.notification_dto import MedicationReminderNotificationDTO
+from app.dto.notification.medication_reminder_notification import MedicationReminderNotificationDTO
 from app.models.user import User
 from app.models.medication import Medication
 from app.models.patient_profile import PatientProfile

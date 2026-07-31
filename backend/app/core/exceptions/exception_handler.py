@@ -51,9 +51,9 @@ async def general_exception_handler(
     )
 
 
-async def ai__exception_handler(
+async def ai_exception_handler(
         request: Request,
-        exc: Exception
+        exc: AIProviderException
         ):
 
     return JSONResponse(

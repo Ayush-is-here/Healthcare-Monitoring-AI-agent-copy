@@ -8,6 +8,9 @@ class NotificationChannelRouter:
     _NOTIFICATION_CHANNEL_MAP = {
             NotificationType.MEDICATION_REMINDER: [
                 NotificationChannel.EMAIL
+            ],
+            NotificationType.HEALTH_INSIGHT: [
+                NotificationChannel.EMAIL
             ]
         }
 

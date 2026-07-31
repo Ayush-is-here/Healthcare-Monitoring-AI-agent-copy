@@ -16,7 +16,7 @@ from app.api.routes import medication_reminder
 from app.api.routes import dashboard
 from app.api.routes.ai import health_insight
 from app.core.exceptions.ai import *
-from app.core.exceptions.exception_handler import ai__exception_handler
+from app.core.exceptions.exception_handler import ai_exception_handler
 
 
 @asynccontextmanager
@@ -40,9 +40,9 @@ app = FastAPI(
 
 app.add_exception_handler(StarletteHTTPException, http_exception_handler)
 app.add_exception_handler(RequestValidationError, validation_exception_handler)
-app.add_exception_handler(AIProviderException, ai__exception_handler)
-app.add_exception_handler(AIResponseParsingException, ai__exception_handler)
-app.add_exception_handler(AIValidationException, ai__exception_handler)
+app.add_exception_handler(AIProviderException, ai_exception_handler)
+app.add_exception_handler(AIResponseParsingException, ai_exception_handler)
+app.add_exception_handler(AIValidationException, ai_exception_handler)
 app.add_exception_handler(Exception, general_exception_handler)
 app.include_router(auth.router)
 app.include_router(profile.router)

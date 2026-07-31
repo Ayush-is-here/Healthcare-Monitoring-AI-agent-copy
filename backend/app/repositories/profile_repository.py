@@ -1,7 +1,7 @@
 from uuid import UUID
 
 from sqlalchemy import select
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from app.models.patient_profile import PatientProfile
 from app.schemas.patient_profile import PatientProfileCreate
@@ -10,15 +10,35 @@ from app.schemas.patient_profile import PatientProfileCreate
 class ProfileRepository:
 
     @staticmethod
+    def get_patient_profiles(
+        db: Session,
+        skip: int,
+        limit: int
+    ) -> list[PatientProfile]:
+
+        return db.scalars(
+                select(PatientProfile)
+                .offset(skip)
+                .limit(limit)
+                ).all()
+        
+
+
+    @staticmethod
     def get_by_id(
         db: Session,
         patient_profile_id: UUID
     ) -> PatientProfile:
         
         return db.scalars(
-            select(PatientProfile).where(PatientProfile.id==patient_profile_id)
-        ).one_or_none()
-
+            select(PatientProfile)
+            .options(
+                joinedload(PatientProfile.user)
+            )
+            .where(
+                PatientProfile.id==patient_profile_id
+                )
+                ).one_or_none()
 
 
     @staticmethod

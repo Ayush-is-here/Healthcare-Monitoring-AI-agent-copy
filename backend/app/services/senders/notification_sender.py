@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
-from app.domain.notification_content import NotificationContent
-from app.dto.notification_dto import MedicationReminderNotificationDTO
+from app.dto.notification.notification_content import NotificationContent
+from app.dto.notification.medication_reminder_notification import MedicationReminderNotificationDTO
 
 
 class NotificationSender(ABC):

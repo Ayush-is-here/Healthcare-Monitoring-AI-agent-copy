@@ -1,6 +1,6 @@
 from app.services.senders.notification_sender import NotificationSender
-from app.domain.notification_content import NotificationContent
-from app.dto.notification_dto import MedicationReminderNotificationDTO
+from app.dto.notification.notification_content import NotificationContent
+from app.dto.notification.medication_reminder_notification import MedicationReminderNotificationDTO
 from app.services.email.email_client import EmailClient
 
 class EmailSender(NotificationSender):
@@ -18,7 +18,7 @@ class EmailSender(NotificationSender):
     ) -> None :
         
         self._email_client.send(
-            recipient=notification.email,
+            recipient=notification.recipient.email,
             subject=content.title,
             body=content.body
         )

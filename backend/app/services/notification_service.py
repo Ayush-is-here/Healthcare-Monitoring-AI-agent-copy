@@ -1,4 +1,4 @@
-from app.dto.notification_dto import MedicationReminderNotificationDTO
+from app.dto.notification.medication_reminder_notification import MedicationReminderNotificationDTO
 from app.core.enums.notification_type import NotificationType
 from app.services.senders.notification_sender_factory import NotificationSenderFactory
 from app.services.notification_template_service import NotificationTemplateService
@@ -13,17 +13,17 @@ class NotificationService:
         self._sender_factory = sender_factory
 
     
-    def send_medication_reminder(
+    def send(
         self,
         notification: MedicationReminderNotificationDTO,
         ) -> None:
 
-        content = NotificationTemplateService.build_medication_reminder(
+        content = NotificationTemplateService.build(
             notification=notification
         )
 
         channels = NotificationChannelRouter.route(
-            notification_type=NotificationType.MEDICATION_REMINDER
+            notification_type=notification.notification_type
         )
 
         for channel in channels:
