@@ -11,6 +11,11 @@ class PatientProfileCreate(BaseModel):
         lt=300.0,
         description="Patient's height measured in centimeters (must be between 30.0 and 300.0)"
     )
+    weight_kg: float = Field(
+        gt=2.0,
+        lt=500.0,
+        description="Patient's weight measured in kilograms (must be between 2.0 and 500.0)"
+    )
     blood_group: BloodGroup
     smoking_status: SmokingStatus
     drinking_status: DrinkingStatus
@@ -52,6 +57,11 @@ class PatientProfileResponse(PatientProfileCreate):
     created_at: datetime
     updated_at: datetime
 
+    # Reading is not writing: a row stored before these bounds existed
+    # must still be readable, so the inherited constraints are dropped
+    # here rather than turning old data into a 500.
+    height_cm: float
+    weight_kg: float
 
     model_config = ConfigDict(
         from_attributes=True,
@@ -65,6 +75,11 @@ class PatientProfileUpdate(BaseModel):
         default=None,
         gt=30.0,
         lt=300.0
+    )
+    weight_kg: float | None = Field(
+        default=None,
+        gt=2.0,
+        lt=500.0
     )
     blood_group: BloodGroup | None = Field(None)
     smoking_status: SmokingStatus | None = Field(None)
