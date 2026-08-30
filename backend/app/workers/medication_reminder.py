@@ -1,7 +1,7 @@
 from app.database.session import SessionLocal
 from app.repositories.medication_reminder_repository import MedicationReminderRepository
 from datetime import datetime
-from backend.app.dto.notification.medication_reminder_notification import MedicationReminderNotificationDTO
+from app.dto.notification.medication_reminder_notification import MedicationReminderNotificationDTO
 from app.dependencies.notification import get_notification_service
 
 

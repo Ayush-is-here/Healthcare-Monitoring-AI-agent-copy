@@ -4,6 +4,7 @@ from app.schemas.ai.medication_context import MedicationContext
 from app.schemas.ai.appointment_context import AppointmentContext
 from app.schemas.rule_engine.rule_result import RuleResult
 from app.schemas.ai.health_context import HealthContext
+from app.dto.agent.tool_payload.tool_result import ToolResult
 
 
 class PromptBuilder:
@@ -154,11 +155,40 @@ class PromptBuilder:
 
         return "\n".join(triggered_rules_section)
 
+    @staticmethod
+    def build_tool_results_section(
+        tool_results: list[ToolResult]
+        ) -> str:
+
+        tool_results_section: list[str] = [
+            "## TOOL RESULTS"
+        ]
+
+        if not tool_results:
+            tool_results_section.append("No tools were executed.")
+            return "\n".join(tool_results_section)
+
+        for result in tool_results:
+            tool_results_section.append(
+            f"### {result.tool_type.value}"
+            )
+
+            tool_results_section.append(
+                result.payload.model_dump_json(
+                    indent=2
+                )
+            )
+
+            tool_results_section.append("")
+
+        return "\n".join(tool_results_section)
+
 
     @staticmethod
     def build_prompt(
         health_context: HealthContext,
-        triggered_rules: list[RuleResult]
+        triggered_rules: list[RuleResult],
+        tool_result: list[ToolResult]
     ) -> str:
 
         patient_prompt = PromptBuilder.build_patient_section(health_context.patient)
@@ -166,19 +196,38 @@ class PromptBuilder:
         medication_prompt = PromptBuilder.build_medication_section(health_context.medications)
         appointment_prompt = PromptBuilder.build_appointment_section(health_context.appointments)
         triggered_rules_prompt = PromptBuilder.build_triggered_rules_section(triggered_rules)
+        tool_result_prompt = PromptBuilder.build_tool_results_section(tool_result)
 
         prompt: list[str] = [
             patient_prompt,
             metric_prompt,
             medication_prompt,
             appointment_prompt,
-            triggered_rules_prompt
+            triggered_rules_prompt,
+            tool_result_prompt
         ]
 
         prompt.append("# TASK")
-        prompt.append("Analyze the patient information provided above.")
-        prompt.append("Identify significant health findings and potential health risks.")
-        prompt.append("Generate practical lifestyle recommendations based only on the available information.")
-        prompt.append("Return ONLY the required JSON object that follows the specified response schema.")
+        prompt.append(
+        "Analyze the patient's health information using the available "
+        "tool results as supporting evidence."
+    )
+        prompt.append(
+        "Integrate relevant clinical research when it is available."
+    )
+        prompt.append(
+        "Identify significant health findings and potential health risks."
+    )
+        prompt.append(
+        "Generate practical lifestyle recommendations based only on "
+        "the available information and supporting evidence."
+    )
+        prompt.append(
+        "Do not treat tool output as a diagnosis."
+    )
+        prompt.append(
+        "Return ONLY the required JSON object that follows the "
+        "specified response schema."
+    )
 
         return "\n".join(prompt)

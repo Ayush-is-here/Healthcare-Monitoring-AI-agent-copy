@@ -2,6 +2,7 @@ from app.schemas.ai.health_context import HealthContext
 from app.schemas.ai.health_insight_response import HealthInsightResponse
 from app.schemas.rule_engine.rule_result import RuleResult
 from app.agents.health_agent import HealthAgent
+from uuid import UUID
 
 class HealthInsightService:
 
@@ -14,11 +15,13 @@ class HealthInsightService:
     def get_health_insight(
             self,
             health_context: HealthContext,
-            triggered_rules: list[RuleResult]
+            triggered_rules: list[RuleResult],
+            user_id: UUID
             ) -> HealthInsightResponse:
 
 
         return self.health_agent.run(
             health_context=health_context,
-            triggered_rules=triggered_rules
+            triggered_rules=triggered_rules,
+            user_id=user_id
         )

@@ -12,16 +12,32 @@ from app.core.exceptions.ai import (
 from pydantic import ValidationError
 from typing import Any
 
+from app.agents.planner import Planner
+from app.agents.tool_executor import ToolExecutor
+from app.dto.agent.execution_plan import ExecutionPlan
+
 
 def prompt_node(state: HealthInsightState) -> dict[str, Any]:
 
     user_prompt = PromptBuilder.build_prompt(
         health_context=state.health_context,
-        triggered_rules=state.triggered_rules
+        triggered_rules=state.triggered_rules,
+        tool_result=state.tool_results
     )
 
     return {
         "user_prompt": user_prompt
+    }
+
+def planner_node(
+        state: HealthInsightState,
+        planner: Planner
+) -> dict[str, Any]:
+
+    execution_plan = planner.plan(state)
+
+    return {
+        "selected_tools": execution_plan.steps
     }
 
 def generate_response_node(
@@ -31,9 +47,16 @@ def generate_response_node(
 
     system_instruction = SystemInstruction.build_system_instruction()
 
+    user_prompt = PromptBuilder.build_prompt(
+        health_context=state.health_context,
+        triggered_rules=state.triggered_rules, 
+        tool_result=state.tool_results
+    )
+
     raw_response = ai_adapter.generate(
         system_instruction=system_instruction,
-        user_prompt=state.user_prompt
+        user_prompt=user_prompt,
+        response_schema=HealthInsightResponse
     )
 
     return {
@@ -69,4 +92,26 @@ def parser_node(
 
     return {
         "health_insight": health_insight
+    }
+
+
+
+#========================Tools
+
+def tool_execution_node(
+        state: HealthInsightState,
+        executor: ToolExecutor
+) -> dict[str, Any]:
+
+    execution_plan = ExecutionPlan(
+        steps=state.selected_tools
+    )
+
+    execution_result = executor.execute(
+        plan=execution_plan,
+        state=state
+    )
+
+    return {
+        "tool_results": execution_result.tool_results
     }

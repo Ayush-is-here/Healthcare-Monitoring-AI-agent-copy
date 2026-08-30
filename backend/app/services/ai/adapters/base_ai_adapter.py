@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
+from typing import TypeVar
 
+T = TypeVar("T")
 
 class BaseAIAdapter(ABC):
 
@@ -7,6 +9,7 @@ class BaseAIAdapter(ABC):
     def generate(
         self,
         system_instruction: str,
-        user_prompt: str
+        user_prompt: str,
+        response_schema: type[T] | None = None
     ) -> str:
         ...

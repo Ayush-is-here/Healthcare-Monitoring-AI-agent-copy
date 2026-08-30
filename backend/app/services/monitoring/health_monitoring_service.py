@@ -58,7 +58,8 @@ class HealthMonitoringService:
 
         health_insight_response = self.health_insight_service.get_health_insight(
             health_context=health_context,
-            triggered_rules=triggered_rules
+            triggered_rules=triggered_rules,
+            user_id=patient_profile.user.id
             )
 
         recipient = Recipient(

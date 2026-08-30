@@ -16,7 +16,8 @@ class GeminiAdapter(BaseAIAdapter):
     def generate(
         self,
         system_instruction: str,
-        user_prompt: str
+        user_prompt: str,
+        response_schema: type | None = None
     ) -> str:
 
         try:
@@ -28,9 +29,14 @@ class GeminiAdapter(BaseAIAdapter):
                     system_instruction=system_instruction,
                     temperature=0.2,
 
-                    #
-                    response_mime_type="application/json",
-                    response_schema=HealthInsightResponse
+                    # JSON mode only when a schema defines the shape.
+                    # Schema-less callers expect plain text.
+                    response_mime_type=(
+                        "application/json"
+                        if response_schema is not None
+                        else "text/plain"
+                    ),
+                    response_schema=response_schema
                 )
             )
             return response.text

@@ -11,6 +11,8 @@ class Settings(BaseSettings):
     notification_sender_email: str
     gemini_api_key: str
 
+    pubmed_email: str
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8"

@@ -1,0 +1,4 @@
+class ToolNotRegisteredError(Exception):
+    pass
+
+

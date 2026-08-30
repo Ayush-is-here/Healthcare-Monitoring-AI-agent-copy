@@ -42,5 +42,6 @@ def get_health_insights(
 
     return health_insight_service.get_health_insight(
         health_context=health_context,
-        triggered_rules=[]
+        triggered_rules=[],
+        user_id = current_user.id
     )
