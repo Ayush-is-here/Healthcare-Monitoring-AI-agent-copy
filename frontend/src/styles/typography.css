@@ -1,0 +1,78 @@
+/* ============================================================
+   Type scale — minor third (1.2) off a 12px base.
+   Display family is reserved for >= 20px at weight 600.
+   Body copy is set light (300) with negative tracking.
+   ============================================================ */
+
+@utility type-display {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(2.5rem, 5.5vw, 4rem);
+  line-height: 1.06;
+  letter-spacing: 0.01em;
+}
+
+@utility type-heading-lg {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.1;
+  letter-spacing: 0.01em;
+}
+
+@utility type-heading {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.5rem;
+  line-height: 1.3;
+  letter-spacing: 0.01em;
+}
+
+@utility type-heading-sm {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.25rem;
+  line-height: 1.3;
+  letter-spacing: 0.01em;
+}
+
+@utility type-subheading {
+  font-family: var(--font-sans);
+  font-weight: 300;
+  font-size: 1.125rem;
+  line-height: 1.4;
+  letter-spacing: -0.2px;
+}
+
+@utility type-body {
+  font-family: var(--font-sans);
+  font-weight: 300;
+  font-size: 1rem;
+  line-height: 1.5;
+  letter-spacing: -0.19px;
+}
+
+@utility type-body-sm {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  letter-spacing: -0.2px;
+}
+
+@utility type-caption {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  letter-spacing: -0.24px;
+}
+
+@utility type-eyebrow {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 0.6875rem;
+  line-height: 1.2;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}

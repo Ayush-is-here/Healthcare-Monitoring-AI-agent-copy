@@ -5,11 +5,10 @@
     "lib": ["ES2023", "DOM"],
     "module": "esnext",
 
-    "baseUrl": ".",
-"paths": {
-  "@/*": ["./src/*"]
-},
-
+    /* Paths resolve relative to this file; baseUrl is deprecated in TS 6. */
+    "paths": {
+      "@/*": ["./src/*"]
+    },
 
     "types": ["vite/client"],
     "allowArbitraryExtensions": true,

@@ -1,0 +1,95 @@
+/* ============================================================
+   Design tokens — "Monochrome Utility, Human Touch"
+   A disciplined black / white / gray system. Colour is
+   deliberately withheld from the core UI: one action blue for
+   links and info, plus a narrow clinical status ramp that is
+   only ever allowed to appear as tinted text on a pale wash.
+   ============================================================ */
+
+@theme {
+  /* ---- Brand neutrals ------------------------------------ */
+  --color-ink: #101010;
+  --color-graphite: #242424;
+  --color-slate: #6b7280;
+  --color-stone: #898989;
+  --color-silver: #e5e7eb;
+  --color-paper: #f4f4f4;
+  --color-paper-deep: #ededed;
+
+  /* ---- Sole accent --------------------------------------- */
+  --color-action: #0099ff;
+  --color-action-wash: #eff6fe;
+
+  /* ---- Clinical status ramp (used sparingly) -------------- */
+  --color-critical: #b42318;
+  --color-critical-wash: #fef3f2;
+  --color-caution: #b54708;
+  --color-caution-wash: #fffaeb;
+  --color-steady: #067647;
+  --color-steady-wash: #ecfdf3;
+
+  /* ---- Semantic aliases (consumed by components/ui/*) ---- */
+  --color-background: #f4f4f4;
+  --color-foreground: #242424;
+
+  --color-card: #ffffff;
+  --color-card-foreground: #242424;
+
+  --color-popover: #ffffff;
+  --color-popover-foreground: #242424;
+
+  --color-primary: #101010;
+  --color-primary-foreground: #ffffff;
+
+  --color-secondary: #f4f4f4;
+  --color-secondary-foreground: #242424;
+
+  --color-muted: #f4f4f4;
+  --color-muted-foreground: #6b7280;
+
+  --color-accent: #ededed;
+  --color-accent-foreground: #101010;
+
+  --color-destructive: #b42318;
+  --color-destructive-foreground: #ffffff;
+
+  --color-border: #e5e7eb;
+  --color-input: #e5e7eb;
+  --color-ring: #101010;
+
+  --color-sidebar: #ffffff;
+  --color-sidebar-foreground: #242424;
+  --color-sidebar-primary: #101010;
+  --color-sidebar-primary-foreground: #ffffff;
+  --color-sidebar-accent: #f4f4f4;
+  --color-sidebar-accent-foreground: #101010;
+  --color-sidebar-border: #e5e7eb;
+  --color-sidebar-ring: #101010;
+
+  /* ---- Type families ------------------------------------- */
+  --font-display: "Cal Sans", "Poppins", "Gilroy", ui-sans-serif, system-ui,
+    sans-serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+
+  /* ---- Radius -------------------------------------------- */
+  --radius-input: 8px;
+  --radius-card: 12px;
+  --radius-panel: 16px;
+  --radius-pill: 9999px;
+
+  /* ---- Elevation: cards are separated by shadow, never
+          by a border. Diffuse and low-opacity only. -------- */
+  --shadow-card: rgba(36, 36, 36, 0.05) 0 4px 8px 0;
+  --shadow-raised: rgba(36, 36, 36, 0.7) 0 1px 5px -4px,
+    rgba(36, 36, 36, 0.05) 0 4px 8px 0;
+  --shadow-ringed: rgba(19, 19, 22, 0.7) 0 1px 5px -4px,
+    rgba(34, 42, 53, 0.1) 0 0 0 1px, rgba(34, 42, 53, 0.05) 0 4px 8px 0;
+  --shadow-hairline: rgba(0, 0, 0, 0.1) 0 1px 3px 0, rgba(0, 0, 0, 0.06) 0 0 2px 0;
+
+  /* ---- Spacing rhythm ----------------------------------- */
+  --spacing-section: 96px;
+  --spacing-gutter: 24px;
+
+  /* ---- Motion ------------------------------------------- */
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+}
