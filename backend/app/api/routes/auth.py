@@ -10,7 +10,10 @@ from app.core.security import create_access_token, get_current_user
 from app.core.permissions import require_roles
 from app.models.enum import UserRole
 
-router = APIRouter()
+router = APIRouter(
+    prefix="/auth",
+    tags=["auth"],
+)
 
 @router.post("/register",
              response_model= RegisterResponse,

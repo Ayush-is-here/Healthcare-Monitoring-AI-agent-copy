@@ -23,7 +23,7 @@ def update_profile(
         profile_data=profile_data
     )
 
-@router.post("/profile",
+@router.post("/",
              response_model=PatientProfileResponse,
              status_code=status.HTTP_201_CREATED
              )
