@@ -90,6 +90,20 @@
   --spacing-section: 96px;
   --spacing-gutter: 24px;
 
-  /* ---- Motion ------------------------------------------- */
+  /* ---- Motion -------------------------------------------
+          Two curves, and the difference between them matters:
+
+          `out-soft` is an out-quint. Measured on a 300ms fade,
+          it is 72% of the way through in the first 60ms and
+          spends the remaining 240ms covering the last sliver.
+          That is right for a control acknowledging a press —
+          it feels immediate — and wrong for anything arriving
+          from nothing, which reads as a pop however long the
+          duration is set to.
+
+          `glide` is the standard ease-in-out: it leaves slowly,
+          does most of its travel through the middle, and
+          settles. Use it when something appears or leaves. */
   --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-glide: cubic-bezier(0.4, 0, 0.2, 1);
 }
