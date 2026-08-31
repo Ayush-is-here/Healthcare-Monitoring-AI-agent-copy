@@ -18,6 +18,7 @@ from app.api.routes.ai import health_insight
 from app.core.exceptions.ai import *
 from app.core.exceptions.exception_handler import ai_exception_handler
 
+from fastapi.middleware.cors import CORSMiddleware
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -36,6 +37,17 @@ app = FastAPI(
     description = "AI-powered healthcare monitoring and insights platform",
     version="1.0.0",
     lifespan=lifespan
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+        "https://healthcare-monitoring-ai-agent-copy.vercel.app",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 app.add_exception_handler(StarletteHTTPException, http_exception_handler)
