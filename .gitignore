@@ -46,3 +46,4 @@ node_modules/
 
 # Claude Code — launch.json is shared, local permission grants are not
 .claude/settings.local.json
+.claude
