@@ -43,7 +43,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:5173",
-        "https://healthcare-monitoring-ai-agent-copy.vercel.app.vercel.app",
+        "https://healthcare-monitoring-ai-agent-copy.vercel.app",
     ],
     allow_credentials=True,
     allow_methods=["*"],
