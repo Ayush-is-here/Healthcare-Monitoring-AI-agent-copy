@@ -4,6 +4,7 @@ export const PATHS = {
   signUp: "/sign-up",
   profileSetup: "/profile-setup",
   profile: "/profile",
+  dashboard: "/dashboard",
   metrics: "/metrics",
   trends: "/trends",
   medications: "/medications",

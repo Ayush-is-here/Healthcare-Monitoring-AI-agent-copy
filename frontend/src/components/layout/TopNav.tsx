@@ -1,4 +1,4 @@
-import { Activity, CalendarDays, LogOut, Pill, TrendingUp } from "lucide-react";
+import { Activity, CalendarDays, LayoutDashboard, LogOut, Pill, TrendingUp } from "lucide-react";
 import { useId } from "react";
 import { NavLink } from "react-router-dom";
 
@@ -20,18 +20,19 @@ function monogram(name: string | undefined): string {
     .join("");
 }
 
-/* Four destinations do not fit as text beside the wordmark, the avatar
-   and sign out until `md` — measured, not assumed: at `md` the four
-   labels leave the row exactly zero slack, which is why the name waits
-   for `lg` and the tagline with it. Below `md` each link is its own icon
-   and the label is carried `sr-only`. The accessible name is the same
-   string at both breakpoints and is announced exactly once — an
+/* Five destinations do not fit as text beside the wordmark, the avatar
+   and sign out until `lg`: at `md` four labels already left the row
+   exactly zero slack, so a fifth pushes the labels out to `lg`, and the
+   name and tagline out to `xl` behind them. Below `lg` each link is its
+   own icon and the label is carried `sr-only`, with the hint panel
+   standing in to name it on hover. The accessible name is the same
+   string at every breakpoint and is announced exactly once — an
    `aria-label` alongside visible text would override it, and a mismatched
    pair would break voice control, which matches on what is on screen.
    `size-8` gives the glyph a real tap target rather than leaving it at
    the icon's own 16px. */
 const NAV_LINK =
-  "type-body-sm grid size-8 place-items-center rounded-pill text-slate transition-colors duration-200 hover:text-graphite focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/10 md:block md:size-auto md:px-1";
+  "type-body-sm grid size-8 place-items-center rounded-pill text-slate transition-colors duration-200 hover:text-graphite focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/10 lg:block lg:size-auto lg:px-1";
 
 /* One line each, because "Trends" and "Readings" do not say what is
    behind them — they are our words for a chart and a log, and a patient
@@ -39,6 +40,12 @@ const NAV_LINK =
    describes what the page actually holds; none of them promises
    anything the backend does not do. */
 const NAV_ITEMS = [
+  {
+    to: PATHS.dashboard,
+    label: "Dashboard",
+    icon: LayoutDashboard,
+    blurb: "A summary of your medications, next visit and metric averages.",
+  },
   {
     to: PATHS.trends,
     label: "Trends",
@@ -136,10 +143,10 @@ export function TopNav() {
   const hintId = useId();
 
   return (
-    <header className="shrink-0 border-b border-silver">
+    <header className="shrink-0 border-b border-hairline">
       <div className="mx-auto flex h-16 w-full max-w-[1200px] items-center gap-4 px-5 sm:px-6">
         {/* Two renders rather than one, because the wordmark has to go at
-            375px and `glyphOnly` is a prop, not a breakpoint: four nav
+            375px and `glyphOnly` is a prop, not a breakpoint: five nav
             icons, the avatar and sign out do not fit beside it. Only
             one is ever displayed, so the name is announced once — the
             glyph carries it as `sr-only`. */}
@@ -148,8 +155,8 @@ export function TopNav() {
 
         {/* Both stage in at `lg`: at `sm` the wordmark alone already
             leaves the icon cluster nothing to spare. */}
-        <span aria-hidden className="hidden h-4 w-px bg-silver lg:block" />
-        <p className="type-caption hidden text-stone lg:block">{APP_TAGLINE}</p>
+        <span aria-hidden className="hidden h-4 w-px bg-silver xl:block" />
+        <p className="type-caption hidden text-stone xl:block">{APP_TAGLINE}</p>
 
         {isAuthenticated ? (
           <nav className="ml-auto flex min-w-0 items-center gap-2 md:gap-3">
@@ -171,8 +178,8 @@ export function TopNav() {
                     cn(NAV_LINK, isActive && "font-medium text-graphite")
                   }
                 >
-                  <Icon aria-hidden className="size-4 md:hidden" strokeWidth={2} />
-                  <span className="sr-only md:not-sr-only">{label}</span>
+                  <Icon aria-hidden className="size-4 lg:hidden" strokeWidth={2} />
+                  <span className="sr-only lg:not-sr-only">{label}</span>
                 </NavLink>
 
                 <span id={`${hintId}-${label}`} role="tooltip" className={NAV_HINT}>
@@ -183,9 +190,9 @@ export function TopNav() {
               </span>
             ))}
 
-            {/* `lg`, not `md`: with four labels showing, 768px leaves this
-                no room of its own — measured at exactly zero slack, and
-                the avatar already identifies the account there.
+            {/* `xl`, not `lg`: with five labels showing, the `lg` row
+                leaves this no room of its own, and the avatar already
+                identifies the account there.
 
                 The name only. The address used to sit under it and is
                 gone deliberately: it is the one piece of identity on
@@ -194,7 +201,7 @@ export function TopNav() {
                 `max-w-[12rem]` with `min-w-0` because the name is
                 unbounded — the cap holds its natural width and `min-w-0`
                 lets it ellipsise rather than push the row wider. */}
-            <span className="type-body-sm hidden min-w-0 max-w-[12rem] truncate font-medium text-graphite lg:inline-block">
+            <span className="type-body-sm hidden min-w-0 max-w-[12rem] truncate font-medium text-graphite xl:inline-block">
               {user?.name ?? "Signed in"}
             </span>
 
@@ -222,7 +229,7 @@ export function TopNav() {
               aria-label="Sign out"
             >
               <LogOut aria-hidden className="size-3.5" strokeWidth={2} />
-              <span className="hidden md:inline">Sign out</span>
+              <span className="hidden lg:inline">Sign out</span>
             </PillButton>
           </nav>
         ) : null}

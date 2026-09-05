@@ -86,3 +86,20 @@ export function formatClockTime(value: string): string {
   /* The date is arbitrary — only the clock face is being formatted. */
   return timeFormatter.format(new Date(1970, 0, 1, hour, minute));
 }
+
+/**
+ * A stored `YYYY-MM-DDTHH:MM:SS` as a readable date and time.
+ *
+ * The dashboard endpoints hand back naive datetimes (a next appointment,
+ * a reading's last-updated stamp). Splitting on `T` reuses the two
+ * formatters above rather than constructing a Date from the whole
+ * string — the date half would otherwise hit the UTC-midnight trap
+ * `parseIsoDate` exists to avoid. A value with no time part still reads.
+ */
+export function formatIsoDateTime(value: string): string {
+  const [date, time] = value.split("T");
+
+  if (!time) return formatIsoDate(date);
+
+  return `${formatIsoDate(date)} · ${formatClockTime(time)}`;
+}

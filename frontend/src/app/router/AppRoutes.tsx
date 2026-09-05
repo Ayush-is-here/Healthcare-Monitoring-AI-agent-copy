@@ -7,6 +7,7 @@ import { PATHS } from "@/app/router/paths";
 import { useAccessToken } from "@/features/auth/hooks/useSession";
 import { AppointmentsView } from "@/views/AppointmentsView";
 import { ChatView } from "@/views/ChatView";
+import { DashboardView } from "@/views/DashboardView";
 import { MedicationsView } from "@/views/MedicationsView";
 import { MetricsView } from "@/views/MetricsView";
 import { ProfileSetupView } from "@/views/ProfileSetupView";
@@ -66,6 +67,17 @@ export function AppRoutes() {
             <ProtectedRoute>
               <RequireProfile>
                 <ProfileView />
+              </RequireProfile>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path={PATHS.dashboard}
+          element={
+            <ProtectedRoute>
+              <RequireProfile>
+                <DashboardView />
               </RequireProfile>
             </ProtectedRoute>
           }
