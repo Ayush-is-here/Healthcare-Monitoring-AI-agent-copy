@@ -36,6 +36,6 @@ class PatientContextBuilder:
             weight_kg=patient_profile.weight_kg,
             smoking_status=patient_profile.smoking_status,
             drinking_status=patient_profile.drinking_status,
-            allergies=patient_profile.allergies,
-            chronic_conditions=patient_profile.chronic_conditions
+            allergies=patient_profile.allergies or [],
+            chronic_conditions=patient_profile.chronic_conditions or []
         )

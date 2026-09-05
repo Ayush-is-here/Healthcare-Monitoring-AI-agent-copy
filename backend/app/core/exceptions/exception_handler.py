@@ -51,18 +51,21 @@ async def general_exception_handler(
     )
 
 
-async def ai_exception_handler(
-        request: Request,
-        exc: AIProviderException
-        ):
+async def ai_exception_handler(request: Request, exc: Exception):
+    if isinstance(exc, AIProviderException):
+        # provider unreachable / timed out — transient, retryable
+        status_code = status.HTTP_503_SERVICE_UNAVAILABLE
+        message = "The AI service is temporarily unavailable. Please try again in a moment."
+    else:
+        # AIResponseParsingException / AIValidationException:
+        # the model replied, but the response was unusable
+        status_code = status.HTTP_502_BAD_GATEWAY
+        message = "The AI service returned an unexpected response. Please try again."
 
     return JSONResponse(
-        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        status_code=status_code,
         content={
             "success": False,
-            "error": {
-                "status_code": status.HTTP_500_INTERNAL_SERVER_ERROR,
-                "message": str(exc)
-            }
-        }
+            "error": {"status_code": status_code, "message": message},
+        },
     )

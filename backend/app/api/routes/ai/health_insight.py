@@ -7,8 +7,6 @@ from app.services.ai.health_insight_service import HealthInsightService
 from app.services.ai.health_context_service import HealthContextService
 from app.schemas.ai.health_insight_response import HealthInsightResponse
 from app.dependencies.ai import get_health_insight_service
-from app.services.ai.rule_engine.engine import RuleEngine
-
 
 
 router = APIRouter(
