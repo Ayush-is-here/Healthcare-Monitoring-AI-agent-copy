@@ -80,3 +80,7 @@ class AppointmentStatus(Enum):
     PENDING = "pending"
     COMPLETED = "completed"
     CANCELLED = "cancelled"
+
+class ChatRole(str, Enum):
+    USER = "user"
+    ASSISTANT = "assistant"

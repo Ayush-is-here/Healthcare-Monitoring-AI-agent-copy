@@ -5,6 +5,7 @@ from app.models.health_metric import HealthMetric
 from app.models.medication import Medication
 from app.models.appointment import Appointment
 from app.models.medication_reminder import MedicationReminder
+from app.models.chat_message import ChatMessage
 
 # Explicitly export them so Python exposes them cleanly
-__all__ = ["Base", "User", "PatientProfile", "HealthMetric", "Medication", "Appointment", "MedicationReminder"]
+__all__ = ["Base", "User", "PatientProfile", "HealthMetric", "Medication", "Appointment", "MedicationReminder", "ChatMessage"]

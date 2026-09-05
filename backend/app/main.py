@@ -17,6 +17,7 @@ from app.api.routes import dashboard
 from app.api.routes.ai import health_insight
 from app.core.exceptions.ai import *
 from app.core.exceptions.exception_handler import ai_exception_handler
+from app.api.routes.ai import chat
 
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -64,6 +65,7 @@ app.include_router(appointment.router)
 app.include_router(medication_reminder.router)
 app.include_router(dashboard.router)
 app.include_router(health_insight.router)
+app.include_router(chat.router)
 
 
 @app.get("/")
