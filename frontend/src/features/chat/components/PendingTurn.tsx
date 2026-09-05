@@ -8,8 +8,24 @@ import { useElapsedSeconds } from "@/hooks/useElapsedSeconds";
  * report. This shows what the run involves and how long it has been
  * going, rather than animating a progress bar that means nothing.
  */
-export function PendingTurn() {
+export interface PendingTurnProps {
+  /** Heading for the waiting card. Defaults to the insight copy. */
+  title?: string;
+  /** Sub-caption. When omitted, the insight two-stage copy is used. */
+  hint?: string;
+}
+
+export function PendingTurn({
+  title = "Reviewing your record",
+  hint,
+}: PendingTurnProps) {
   const seconds = useElapsedSeconds(true);
+
+  const resolvedHint =
+    hint ??
+    (seconds < 20
+      ? "Metrics, medications and appointments are checked against clinical literature. This usually takes a few seconds."
+      : "Still working — external clinical sources can be slow to respond.");
 
   return (
     <SurfaceCard
@@ -29,9 +45,7 @@ export function PendingTurn() {
           ))}
         </span>
 
-        <p className="type-body-sm font-medium text-graphite">
-          Reviewing your record
-        </p>
+        <p className="type-body-sm font-medium text-graphite">{title}</p>
 
         <span className="type-caption ml-auto tabular-nums text-stone">
           {seconds}s
@@ -48,11 +62,7 @@ export function PendingTurn() {
         ))}
       </div>
 
-      <p className="type-caption text-stone">
-        {seconds < 20
-          ? "Metrics, medications and appointments are checked against clinical literature. This usually takes a few seconds."
-          : "Still working — external clinical sources can be slow to respond."}
-      </p>
+      <p className="type-caption text-stone">{resolvedHint}</p>
     </SurfaceCard>
   );
 }

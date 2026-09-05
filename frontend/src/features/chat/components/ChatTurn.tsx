@@ -1,3 +1,4 @@
+import { AssistantTurn } from "@/features/chat/components/AssistantTurn";
 import { NoticeTurn } from "@/features/chat/components/NoticeTurn";
 import { UserTurn } from "@/features/chat/components/UserTurn";
 import type { ChatMessage } from "@/features/chat/types";
@@ -16,6 +17,9 @@ export function ChatTurn({ message }: ChatTurnProps) {
   switch (message.kind) {
     case "user":
       return <UserTurn text={message.text} />;
+
+    case "assistant":
+      return <AssistantTurn text={message.text} />;
 
     case "insight":
       return (

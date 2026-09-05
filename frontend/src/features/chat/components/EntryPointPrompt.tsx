@@ -1,7 +1,6 @@
 import { ArrowRight, Sparkles } from "lucide-react";
 
 import { SurfaceCard } from "@/components/primitives/SurfaceCard";
-import { Tag } from "@/components/primitives/Tag";
 import { CHAT_ENTRY_POINTS } from "@/features/chat/registry/entryPoints";
 import type { ChatEntryPointId } from "@/features/chat/types";
 
@@ -36,33 +35,38 @@ export function EntryPointPrompt({
         </p>
       </header>
 
-      <ul className="flex w-full flex-col gap-3">
+      <ul className="mx-auto flex w-full max-w-[36rem] flex-col gap-3">
         {CHAT_ENTRY_POINTS.map((entry) => (
           <li key={entry.id}>
             <SurfaceCard
               padding="flush"
-              className="overflow-hidden transition-shadow duration-200 ease-[var(--ease-out-soft)] hover:shadow-raised"
+              className="transition-shadow duration-200 ease-[var(--ease-out-soft)] hover:shadow-raised"
             >
               <button
                 type="button"
                 onClick={() => onLaunch(entry.id)}
                 disabled={disabled || !entry.available}
-                className="group flex w-full items-center gap-5 p-6 text-left disabled:cursor-not-allowed disabled:opacity-50"
+                className="group flex w-full items-center gap-4 p-5 text-left disabled:cursor-not-allowed disabled:opacity-50 sm:gap-5 sm:p-6"
               >
-                <span className="flex min-w-0 flex-1 flex-col items-start gap-2.5">
-                  <Tag tone="neutral">{entry.eyebrow}</Tag>
+                <span
+                  aria-hidden
+                  className="grid size-11 shrink-0 place-items-center rounded-panel bg-paper text-ink"
+                >
+                  <Sparkles className="size-5" strokeWidth={1.75} />
+                </span>
+
+                <span className="flex min-w-0 flex-1 flex-col gap-0.5">
                   <span className="type-heading-sm text-ink">{entry.label}</span>
                   <span className="type-body-sm text-slate">
                     {entry.description}
                   </span>
                 </span>
 
-                <span
+                <ArrowRight
                   aria-hidden
-                  className="grid size-10 shrink-0 place-items-center rounded-pill bg-paper text-graphite transition-[background-color,color,transform] duration-200 ease-[var(--ease-out-soft)] group-hover:translate-x-0.5 group-hover:bg-ink group-hover:text-white"
-                >
-                  <ArrowRight className="size-4" strokeWidth={2} />
-                </span>
+                  className="size-4 shrink-0 text-stone transition-[color,transform] duration-200 ease-[var(--ease-out-soft)] group-hover:translate-x-0.5 group-hover:text-ink"
+                  strokeWidth={2}
+                />
               </button>
             </SurfaceCard>
           </li>
@@ -70,8 +74,8 @@ export function EntryPointPrompt({
       </ul>
 
       <p className="type-caption max-w-[46ch] text-balance text-stone">
-        Health Insight is the only topic available today. Open-ended
-        conversation arrives once the assistant can answer it safely.
+        Start with a full Health Insight, or ask a question of your own in the
+        box below — your record and this conversation come with it.
       </p>
     </div>
   );

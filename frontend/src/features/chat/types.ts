@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 import type { HealthInsight } from "@/features/health-insight/types";
 
 /**
@@ -11,6 +13,12 @@ import type { HealthInsight } from "@/features/health-insight/types";
 export type ChatMessage =
   | {
       kind: "user";
+      id: string;
+      text: string;
+      createdAt: number;
+    }
+  | {
+      kind: "assistant";
       id: string;
       text: string;
       createdAt: number;
@@ -44,3 +52,10 @@ export interface ChatEntryPoint {
   utterance: string;
   available: boolean;
 }
+
+/** Mirrors the API's ChatResponse: a single free-form reply. */
+export const chatReplySchema = z.object({
+  reply: z.string(),
+});
+
+export type ChatReply = z.infer<typeof chatReplySchema>;

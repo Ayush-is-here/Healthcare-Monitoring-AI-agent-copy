@@ -51,6 +51,18 @@ export function useChatSession() {
     });
   }, []);
 
+  const appendAssistant = useCallback((text: string) => {
+    dispatch({
+      type: "append",
+      message: {
+        kind: "assistant",
+        id: nextId("assistant"),
+        text,
+        createdAt: Date.now(),
+      },
+    });
+  }, []);
+
   const appendInsight = useCallback((insight: HealthInsight) => {
     dispatch({
       type: "append",
@@ -92,6 +104,7 @@ export function useChatSession() {
       status: state.status,
       isEmpty: state.messages.length === 0,
       appendUser,
+      appendAssistant,
       appendInsight,
       appendNotice,
       setStatus,
@@ -101,6 +114,7 @@ export function useChatSession() {
       state.messages,
       state.status,
       appendUser,
+      appendAssistant,
       appendInsight,
       appendNotice,
       setStatus,

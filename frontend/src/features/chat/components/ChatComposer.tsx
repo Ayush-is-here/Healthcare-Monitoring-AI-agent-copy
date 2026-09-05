@@ -1,11 +1,14 @@
-import { useState, type FormEvent, type KeyboardEvent } from "react";
-import { ArrowUp, Lock } from "lucide-react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type FormEvent,
+  type KeyboardEvent,
+} from "react";
+import { ArrowUp, Sparkles } from "lucide-react";
 
 import { PillButton } from "@/components/primitives/PillButton";
-import {
-  COMPOSER_UNLOCKED,
-  CHAT_ENTRY_POINTS,
-} from "@/features/chat/registry/entryPoints";
+import { CHAT_ENTRY_POINTS } from "@/features/chat/registry/entryPoints";
 import type { ChatEntryPointId } from "@/features/chat/types";
 import { cn } from "@/lib/utils";
 
@@ -16,15 +19,24 @@ export interface ChatComposerProps {
 }
 
 /**
- * The composer is present but honestly gated: the API exposes no
- * free-form chat branch yet, so free text is disabled and the one
- * real capability is offered as an explicit action instead of
- * pretending typed input does something.
+ * Free-form input with a persistent shortcut to the one structured
+ * action. Typed questions go to /ai/chat; the pill on the left runs a
+ * full Health Insight without the reader having to phrase it.
  */
 export function ChatComposer({ onSend, onLaunch, busy }: ChatComposerProps) {
   const [draft, setDraft] = useState("");
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const primaryEntry = CHAT_ENTRY_POINTS[0];
-  const canSend = COMPOSER_UNLOCKED && draft.trim().length > 0 && !busy;
+  const canSend = draft.trim().length > 0 && !busy;
+
+  // Rest at a single line and grow with the message, capped so a long
+  // paste scrolls instead of swallowing the transcript.
+  useEffect(() => {
+    const el = textareaRef.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = `${Math.min(el.scrollHeight, 160)}px`;
+  }, [draft]);
 
   const submit = (event?: FormEvent) => {
     event?.preventDefault();
@@ -44,7 +56,7 @@ export function ChatComposer({ onSend, onLaunch, busy }: ChatComposerProps) {
   return (
     <form
       onSubmit={submit}
-      className="rounded-panel bg-white p-3 shadow-card transition-shadow duration-200 focus-within:shadow-raised"
+      className="rounded-panel bg-white p-2.5 shadow-card transition-shadow duration-200 focus-within:shadow-raised"
     >
       <label htmlFor="chat-draft" className="sr-only">
         Message
@@ -52,53 +64,41 @@ export function ChatComposer({ onSend, onLaunch, busy }: ChatComposerProps) {
 
       <textarea
         id="chat-draft"
-        rows={2}
+        ref={textareaRef}
+        rows={1}
         value={draft}
-        disabled={!COMPOSER_UNLOCKED || busy}
+        disabled={busy}
         onChange={(event) => setDraft(event.target.value)}
         onKeyDown={onKeyDown}
-        placeholder={
-          COMPOSER_UNLOCKED
-            ? "Ask about your health record…"
-            : "Free-form questions are not available yet."
-        }
+        placeholder="Ask about your health record…"
         className={cn(
-          "type-body block w-full resize-none bg-transparent px-2 pt-1.5",
+          "type-body block w-full resize-none overflow-y-auto bg-transparent px-2 pt-1.5",
           "text-graphite placeholder:text-stone focus:outline-none",
           "disabled:cursor-not-allowed",
         )}
       />
 
-      <div className="flex items-center justify-between gap-3 pt-1">
-        <p className="type-caption flex items-center gap-1.5 pl-2 text-stone">
-          {COMPOSER_UNLOCKED ? (
-            <>Enter to send · Shift + Enter for a new line</>
-          ) : (
-            <>
-              <Lock aria-hidden className="size-3" strokeWidth={2} />
-              Health Insight only
-            </>
-          )}
-        </p>
+      <div className="flex items-center justify-between gap-3 pt-0.5">
+        <PillButton
+          type="button"
+          variant="quiet"
+          size="md"
+          disabled={busy}
+          onClick={() => onLaunch(primaryEntry.id)}
+          className="-ml-4"
+        >
+          <Sparkles aria-hidden className="size-4" strokeWidth={2} />
+          Generate {primaryEntry.label}
+        </PillButton>
 
-        {COMPOSER_UNLOCKED ? (
-          <PillButton
-            type="submit"
-            size="icon"
-            disabled={!canSend}
-            aria-label="Send message"
-          >
-            <ArrowUp className="size-4" strokeWidth={2.25} />
-          </PillButton>
-        ) : (
-          <PillButton
-            size="sm"
-            disabled={busy}
-            onClick={() => onLaunch(primaryEntry.id)}
-          >
-            {busy ? "Generating…" : `Generate ${primaryEntry.label}`}
-          </PillButton>
-        )}
+        <PillButton
+          type="submit"
+          size="icon"
+          disabled={!canSend}
+          aria-label="Send message"
+        >
+          <ArrowUp className="size-4" strokeWidth={2.25} />
+        </PillButton>
       </div>
     </form>
   );

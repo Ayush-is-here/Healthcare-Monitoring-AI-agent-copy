@@ -12,6 +12,9 @@ export interface ChatTranscriptProps {
   messages: ChatMessage[];
   status: ChatStatus;
   onLaunch: (id: ChatEntryPointId) => void;
+  /** Copy for the waiting card; falls back to PendingTurn's defaults. */
+  pendingTitle?: string;
+  pendingHint?: string;
 }
 
 /** Scroll container for the conversation. Owns no chat logic. */
@@ -19,6 +22,8 @@ export function ChatTranscript({
   messages,
   status,
   onLaunch,
+  pendingTitle,
+  pendingHint,
 }: ChatTranscriptProps) {
   const scrollRef = useAutoScroll(`${messages.length}:${status}`);
   const isEmpty = messages.length === 0 && status === "idle";
@@ -26,21 +31,23 @@ export function ChatTranscript({
   return (
     <div
       ref={scrollRef}
-      className="scrollbar-hairline min-h-0 flex-1 overflow-y-auto"
+      className="scrollbar-hairline flex min-h-0 flex-1 flex-col overflow-y-auto"
     >
-      <div className="mx-auto flex w-full max-w-3xl flex-col gap-5 px-5 pb-8 sm:px-6">
-        {isEmpty ? (
+      {isEmpty ? (
+        <div className="flex flex-1 items-center justify-center px-5 pb-8 sm:px-6">
           <EntryPointPrompt onLaunch={onLaunch} />
-        ) : (
-          <>
-            <div className="h-6" />
-            {messages.map((message) => (
-              <ChatTurn key={message.id} message={message} />
-            ))}
-            {status === "working" ? <PendingTurn /> : null}
-          </>
-        )}
-      </div>
+        </div>
+      ) : (
+        <div className="mx-auto flex w-full max-w-3xl shrink-0 flex-col gap-5 px-5 pb-8 sm:px-6">
+          <div className="h-6" />
+          {messages.map((message) => (
+            <ChatTurn key={message.id} message={message} />
+          ))}
+          {status === "working" ? (
+            <PendingTurn title={pendingTitle} hint={pendingHint} />
+          ) : null}
+        </div>
+      )}
     </div>
   );
 }
