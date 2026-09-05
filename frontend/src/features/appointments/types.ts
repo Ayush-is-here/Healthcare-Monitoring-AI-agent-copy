@@ -41,9 +41,26 @@ export interface CreateAppointmentPayload {
   notes?: string;
 }
 
-/* No update payload: nothing patches this pass. PATCH /appointments/{id}
-   exists, but a correction is delete-and-re-add, the same call the
-   medications pass made. */
+/**
+ * PATCH /appointments/{id} — request.
+ *
+ * A true PATCH (`exclude_unset`), so only the keys sent are touched. The
+ * edit form sends the whole set every time rather than a diff: each
+ * required column is written from a validated, non-empty field, and the
+ * two nullable ones carry an explicit `null` when cleared —
+ * `undefined` would drop the key and leave the old value in place, so a
+ * blanked-out location could never actually be removed. `status` stays
+ * absent, exactly as on create: `AppointmentUpdate` forbids extra
+ * fields, and no route can move a row off `pending` regardless.
+ */
+export interface UpdateAppointmentPayload {
+  doctor_name: string;
+  appointment_date: string;
+  appointment_time: string;
+  purpose: string;
+  location: string | null;
+  notes: string | null;
+}
 
 /**
  * GET /appointments/ — one row. No `patient_profile_id` is returned.

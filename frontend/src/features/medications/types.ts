@@ -115,6 +115,22 @@ export interface CreateMedicationReminderPayload {
   reminder_time: string;
 }
 
+/**
+ * PATCH /medication-reminders/{id} — request.
+ *
+ * A true PATCH (`exclude_unset`), so only the keys sent are touched, and
+ * `MedicationReminderUpdate` sets `extra="forbid"`. The editor sends only
+ * `reminder_time`; `is_active` is part of the contract but stays out of
+ * the UI, the way it always has — nothing here toggles a single time on
+ * or off, and `get_due_medication_notifications` reads this flag, not the
+ * medication's. See `updateMedicationReminder`.
+ */
+export interface UpdateMedicationReminderPayload {
+  /** `HH:MM:SS`, whole-minute like create. */
+  reminder_time?: string;
+  is_active?: boolean;
+}
+
 /** GET /medication-reminders/{medication_id}/reminders — one row. */
 export const medicationReminderSchema = z.object({
   id: z.string(),

@@ -159,7 +159,17 @@ export interface CreateMetricPayload {
   recorded_at: string;
 }
 
-/** PATCH /health-metrics/{id} — request. Not used yet. */
+/**
+ * PATCH /health-metrics/{id} — request.
+ *
+ * A true PATCH (`exclude_unset`), so only the keys sent are touched. The
+ * edit form sends just `value` and `recorded_at`: correcting a reading
+ * means fixing its number or its timestamp, not reclassifying it, so
+ * `metric_type` and `unit` are held fixed and never sent — a systolic
+ * row that became a weight would corrupt every per-type average the
+ * backend draws. `Partial` mirrors the server, which types every column
+ * optional. See `toMetricUpdatePayload`.
+ */
 export type UpdateMetricPayload = Partial<CreateMetricPayload>;
 
 /** GET /health-metrics/ — one row. */

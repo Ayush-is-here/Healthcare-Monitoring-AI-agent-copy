@@ -1,6 +1,7 @@
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Clock, Plus, Trash2 } from "lucide-react";
+import { Clock, Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import { PillButton } from "@/components/primitives/PillButton";
@@ -8,10 +9,12 @@ import { TextField } from "@/components/primitives/TextField";
 import { useCreateMedicationReminder } from "@/features/medications/hooks/useCreateMedicationReminder";
 import { useDeleteMedicationReminder } from "@/features/medications/hooks/useDeleteMedicationReminder";
 import { useMedicationReminders } from "@/features/medications/hooks/useMedicationReminders";
+import { useUpdateMedicationReminder } from "@/features/medications/hooks/useUpdateMedicationReminder";
 import {
   reminderFormSchema,
   type ReminderFormValues,
 } from "@/features/medications/medicationFormSchema";
+import type { MedicationReminder } from "@/features/medications/types";
 import { formatClockTime, toWholeMinuteTime } from "@/lib/dates";
 
 export interface ReminderPanelProps {
@@ -48,6 +51,7 @@ export function ReminderPanel({
   );
   const createReminder = useCreateMedicationReminder();
   const deleteReminder = useDeleteMedicationReminder();
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   const {
     register,
@@ -119,36 +123,61 @@ export function ReminderPanel({
             return (
               <li
                 key={reminder.id}
-                className="flex items-center gap-2.5 rounded-input bg-paper px-3 py-2"
+                className="rounded-input bg-paper px-3 py-2"
               >
-                <Clock
-                  aria-hidden
-                  className="size-3.5 shrink-0 text-stone"
-                  strokeWidth={1.5}
-                />
+                {editingId === reminder.id ? (
+                  <ReminderTimeEditor
+                    reminder={reminder}
+                    medicineName={medicineName}
+                    /* Every other saved time, for the duplicate guard —
+                       a time is allowed to keep its own value. */
+                    otherTimes={times
+                      .filter((other) => other.id !== reminder.id)
+                      .map((other) => other.reminder_time)}
+                    onDone={() => setEditingId(null)}
+                  />
+                ) : (
+                  <div className="flex items-center gap-2.5">
+                    <Clock
+                      aria-hidden
+                      className="size-3.5 shrink-0 text-stone"
+                      strokeWidth={1.5}
+                    />
 
-                <span className="type-body-sm flex-1 text-graphite">
-                  {formatClockTime(reminder.reminder_time)}
-                </span>
+                    <span className="type-body-sm flex-1 text-graphite">
+                      {formatClockTime(reminder.reminder_time)}
+                    </span>
 
-                <PillButton
-                  variant="quiet"
-                  size="sm"
-                  disabled={pending}
-                  aria-label={`Remove the ${formatClockTime(reminder.reminder_time)} dose from ${medicineName}`}
-                  onClick={() =>
-                    deleteReminder.mutate(
-                      { reminderId: reminder.id, medicationId },
-                      {
-                        onSuccess: () => toast.success("Time removed."),
-                        onError: (removeError) =>
-                          toast.error(removeError.message),
-                      },
-                    )
-                  }
-                >
-                  <Trash2 aria-hidden className="size-3.5" strokeWidth={2} />
-                </PillButton>
+                    <PillButton
+                      variant="quiet"
+                      size="sm"
+                      disabled={pending}
+                      aria-label={`Change the ${formatClockTime(reminder.reminder_time)} dose time for ${medicineName}`}
+                      onClick={() => setEditingId(reminder.id)}
+                    >
+                      <Pencil aria-hidden className="size-3.5" strokeWidth={2} />
+                    </PillButton>
+
+                    <PillButton
+                      variant="quiet"
+                      size="sm"
+                      disabled={pending}
+                      aria-label={`Remove the ${formatClockTime(reminder.reminder_time)} dose from ${medicineName}`}
+                      onClick={() =>
+                        deleteReminder.mutate(
+                          { reminderId: reminder.id, medicationId },
+                          {
+                            onSuccess: () => toast.success("Time removed."),
+                            onError: (removeError) =>
+                              toast.error(removeError.message),
+                          },
+                        )
+                      }
+                    >
+                      <Trash2 aria-hidden className="size-3.5" strokeWidth={2} />
+                    </PillButton>
+                  </div>
+                )}
               </li>
             );
           })}
@@ -188,6 +217,115 @@ export function ReminderPanel({
       {createReminder.error ? (
         <p role="alert" className="type-body-sm text-critical">
           {createReminder.error.message}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
+interface ReminderTimeEditorProps {
+  reminder: MedicationReminder;
+  medicineName: string;
+  /** The medication's other saved times. The duplicate guard excludes
+      the one being edited, so keeping its own value is allowed. */
+  otherTimes: string[];
+  onDone: () => void;
+}
+
+/**
+ * Changing one saved reminder time, in place of its row.
+ *
+ * Reuses `reminderFormSchema` — the one `HH:MM` field — pre-filled with
+ * the stored time. A save that doesn't change anything just closes, so an
+ * unchanged edit costs no request; a change onto a time already on the
+ * medication is caught here, the same guard the add form runs, since the
+ * server has no unique constraint. Only `reminder_time` is sent.
+ */
+function ReminderTimeEditor({
+  reminder,
+  medicineName,
+  otherTimes,
+  onDone,
+}: ReminderTimeEditorProps) {
+  const updateReminder = useUpdateMedicationReminder();
+
+  const {
+    register,
+    handleSubmit,
+    setError,
+    formState: { errors },
+  } = useForm<ReminderFormValues>({
+    resolver: zodResolver(reminderFormSchema),
+    defaultValues: { reminder_time: reminder.reminder_time.slice(0, 5) },
+  });
+  const onSubmit = handleSubmit((values) => {
+    const reminder_time = toWholeMinuteTime(values.reminder_time);
+
+    /* Nothing changed — close without a round trip. */
+    if (reminder_time === reminder.reminder_time) {
+      onDone();
+      return;
+    }
+
+    if (otherTimes.some((time) => time === reminder_time)) {
+      setError("reminder_time", {
+        message: "That time is already set for this medication.",
+      });
+      return;
+    }
+
+    updateReminder.mutate(
+      { reminderId: reminder.id, patch: { reminder_time } },
+      {
+        onSuccess: (saved) => {
+          toast.success(
+            `${medicineName} — dose moved to ${formatClockTime(saved.reminder_time)}.`,
+          );
+          onDone();
+        },
+      },
+    );
+  });
+  return (
+    <div className="flex flex-col gap-2">
+      <form
+        onSubmit={onSubmit}
+        className="flex flex-col gap-3 sm:flex-row sm:items-start"
+        noValidate
+      >
+        <TextField
+          label="Time"
+          type="time"
+          className="sm:w-40"
+          error={errors.reminder_time?.message ?? null}
+          {...register("reminder_time")}
+        />
+
+        <div className="flex gap-2 sm:mt-[1.9rem]">
+          <PillButton
+            type="submit"
+            variant="ghost"
+            shape="rect"
+            disabled={updateReminder.isPending}
+          >
+            {updateReminder.isPending ? "Saving…" : "Save"}
+          </PillButton>
+
+          <PillButton
+            type="button"
+            variant="quiet"
+            shape="rect"
+            disabled={updateReminder.isPending}
+            onClick={onDone}
+          >
+            Cancel
+          </PillButton>
+        </div>
+      </form>
+
+      {updateReminder.error ? (
+        <p role="alert" className="type-body-sm text-critical">
+          {updateReminder.error.message}
         </p>
       ) : null}
     </div>

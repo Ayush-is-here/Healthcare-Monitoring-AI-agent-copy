@@ -13,6 +13,14 @@ export interface AppointmentListProps {
   /** Reduced emphasis on every row in the section. */
   past?: boolean;
   footnote?: ReactNode;
+  /**
+   * The one row in edit mode across the whole page, or `null`. Owned by
+   * the view, not the section, so opening an editor in Upcoming closes
+   * one open in Past — the same single-open rule `MedicationsView` keeps
+   * for its reminder panels.
+   */
+  editingId: string | null;
+  onEditingChange: (id: string | null) => void;
 }
 
 /**
@@ -29,7 +37,9 @@ export interface AppointmentListProps {
  * The delete mutation and the confirm state live here rather than in the
  * row, the way `MetricLogTable` holds them: one observer per section,
  * and only one row mid-confirm at a time. A `confirmingId` left pointing
- * at a deleted row is inert, so nothing has to reset it.
+ * at a deleted row is inert, so nothing has to reset it. Editing is the
+ * exception — it is hoisted to the view so it is exclusive across both
+ * sections, and the id threads back down through `editingId`.
  */
 export function AppointmentList({
   title,
@@ -37,6 +47,8 @@ export function AppointmentList({
   direction,
   past = false,
   footnote,
+  editingId,
+  onEditingChange,
 }: AppointmentListProps) {
   const deleteAppointment = useDeleteAppointment();
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
@@ -73,6 +85,13 @@ export function AppointmentList({
     });
   };
 
+  /* Opening an editor drops any half-confirmed delete on that row, so the
+     row can't come back from edit mode still showing "Confirm". */
+  const onEdit = (appointment: Appointment) => {
+    setConfirmingId(null);
+    onEditingChange(appointment.id);
+  };
+
   return (
     <section className="flex flex-col gap-4">
       <h2 className="type-heading-sm text-ink">{title}</h2>
@@ -90,6 +109,9 @@ export function AppointmentList({
               }
               onDelete={() => onDelete(appointment)}
               onCancelConfirm={() => setConfirmingId(null)}
+              editing={editingId === appointment.id}
+              onEdit={() => onEdit(appointment)}
+              onDoneEdit={() => onEditingChange(null)}
             />
           </li>
         ))}

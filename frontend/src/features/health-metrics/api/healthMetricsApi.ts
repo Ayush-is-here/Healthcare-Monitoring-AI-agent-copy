@@ -4,6 +4,7 @@ import {
   healthMetricSchema,
   type CreateMetricPayload,
   type HealthMetric,
+  type UpdateMetricPayload,
 } from "@/features/health-metrics/types";
 
 /**
@@ -32,6 +33,23 @@ export async function createHealthMetric(
   payload: CreateMetricPayload,
 ): Promise<HealthMetric> {
   const { data } = await http.post("/health-metrics/", payload);
+  return healthMetricSchema.parse(data);
+}
+
+/**
+ * PATCH /health-metrics/{id} — answers with the whole row.
+ *
+ * A true PATCH server-side (`exclude_unset`), so the edit form decides
+ * which columns are touched by which keys it sends — see
+ * `toMetricUpdatePayload`, which sends only `value` and `recorded_at`. A
+ * 404 means the reading does not exist and a 403 means it is someone
+ * else's; both surface.
+ */
+export async function updateHealthMetric(
+  metricId: string,
+  patch: UpdateMetricPayload,
+): Promise<HealthMetric> {
+  const { data } = await http.patch(`/health-metrics/${metricId}`, patch);
   return healthMetricSchema.parse(data);
 }
 

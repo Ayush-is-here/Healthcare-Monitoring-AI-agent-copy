@@ -20,6 +20,7 @@ import { useMedications } from "@/features/medications/hooks/useMedications";
 export function MedicationsView() {
   const { data: medications, isPending, error } = useMedications();
   const [openId, setOpenId] = useState<string | null>(null);
+  const [openEditId, setOpenEditId] = useState<string | null>(null);
 
   const rows = medications ?? [];
   const active = rows.filter((medication) => medication.is_active);
@@ -32,6 +33,13 @@ export function MedicationsView() {
      otherwise leave `openId` pointing at nothing. */
   const expandedId = rows.some((medication) => medication.id === openId)
     ? openId
+    : null;
+
+  /* Same guard as `expandedId`: editing the open row and deleting it in
+     another tab would otherwise leave `openEditId` pointing at a row that
+     is gone. One row edits at a time, across both sections. */
+  const editingId = rows.some((medication) => medication.id === openEditId)
+    ? openEditId
     : null;
 
   return (
@@ -76,6 +84,8 @@ export function MedicationsView() {
               medications={active}
               expandedId={expandedId}
               onExpandedChange={setOpenId}
+              editingId={editingId}
+              onEditingChange={setOpenEditId}
             />
           ) : null}
 
@@ -85,6 +95,8 @@ export function MedicationsView() {
               medications={inactive}
               expandedId={expandedId}
               onExpandedChange={setOpenId}
+              editingId={editingId}
+              onEditingChange={setOpenEditId}
             />
           ) : null}
 

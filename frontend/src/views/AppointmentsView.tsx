@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -19,17 +20,29 @@ const PAST_SHOWN = 20;
 /**
  * Visits recorded, upcoming and past.
  *
- * No local state at all: nothing on this page expands, so unlike
- * `MedicationsView` there is no `expandedId` to own and no derived-id
- * guard to go with it. Each section owns its own confirm state.
+ * One piece of local state: which row, across both sections, is open for
+ * editing. It lives here rather than in either `AppointmentList` so the
+ * two can't each hold an open editor at once — the same reason
+ * `MedicationsView` owns its `expandedId`. The delete-confirm stays per
+ * section, where only one row is ever mid-confirm anyway.
  */
 export function AppointmentsView() {
   const { data: appointments, isPending, error } = useAppointments();
+  const [openEditId, setOpenEditId] = useState<string | null>(null);
 
   const rows = appointments ?? [];
   /* One `now` for the whole render, so the two sections cannot disagree
      about where the line is. */
   const now = nowParts();
+
+  /* A refetch can drop the row being edited — deleted in another tab, or
+     resettled out of the capped Past slice. Deriving the id against the
+     current rows, the way `MedicationsView` guards `expandedId`, means a
+     stale `openEditId` simply resolves to `null` instead of leaving a
+     phantom editor open on a row that is no longer shown. */
+  const editingId = rows.some((appointment) => appointment.id === openEditId)
+    ? openEditId
+    : null;
 
   const upcoming = rows.filter((appointment) => isUpcoming(appointment, now));
   const past = rows.filter((appointment) => !isUpcoming(appointment, now));
@@ -83,6 +96,8 @@ export function AppointmentsView() {
               title="Upcoming"
               appointments={upcoming}
               direction="asc"
+              editingId={editingId}
+              onEditingChange={setOpenEditId}
             />
           ) : null}
 
@@ -92,6 +107,8 @@ export function AppointmentsView() {
               appointments={shownPast}
               direction="desc"
               past
+              editingId={editingId}
+              onEditingChange={setOpenEditId}
               footnote={
                 past.length > shownPast.length
                   ? `Showing the ${PAST_SHOWN} most recent of ${past.length} past visits.`

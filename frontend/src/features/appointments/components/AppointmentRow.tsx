@@ -1,8 +1,9 @@
-import { CalendarDays, MapPin, Trash2 } from "lucide-react";
+import { CalendarDays, MapPin, Pencil, Trash2 } from "lucide-react";
 
 import { PillButton } from "@/components/primitives/PillButton";
 import { SurfaceCard } from "@/components/primitives/SurfaceCard";
 import { Tag } from "@/components/primitives/Tag";
+import { AppointmentForm } from "@/features/appointments/components/AppointmentForm";
 import { statusLabel, type Appointment } from "@/features/appointments/types";
 import { formatClockTime, formatIsoDate } from "@/lib/dates";
 import { cn } from "@/lib/utils";
@@ -15,20 +16,25 @@ export interface AppointmentRowProps {
   deleting: boolean;
   onDelete: () => void;
   onCancelConfirm: () => void;
+  /** Replaces the row with an inline edit form — one row at a time. */
+  editing: boolean;
+  onEdit: () => void;
+  onDoneEdit: () => void;
 }
 
 /**
- * One visit, plus the one thing you can do to it.
+ * One visit, plus the two things you can do to it.
  *
  * Deliberately not a disclosure: `MedicationRow` is one only because it
- * owns a reminder panel, and nothing expands here. So there is no
- * `useId`, no `aria-expanded`, and no button-inside-button hazard — the
- * two-click delete confirm never depended on any of that.
+ * owns a reminder panel it toggles. Editing here swaps the whole row for
+ * the form in place rather than expanding beneath it, so there is still
+ * no `aria-expanded` and no button-inside-button hazard — the edit form
+ * simply takes the card over until it's dismissed.
  *
- * The confirm state and the mutation both live in `AppointmentList`, the
- * way `MetricLogTable` holds them for its rows: one mutation observer
- * for the whole section rather than one per row, and only one row can be
- * mid-confirm.
+ * The confirm state and both mutations live above the row — delete and
+ * its confirm in `AppointmentList`, the edit id in the view — the way
+ * `MetricLogTable` holds them for its rows: one observer per section, and
+ * only one row mid-confirm or mid-edit at a time.
  */
 export function AppointmentRow({
   appointment,
@@ -37,14 +43,34 @@ export function AppointmentRow({
   deleting,
   onDelete,
   onCancelConfirm,
+  editing,
+  onEdit,
+  onDoneEdit,
 }: AppointmentRowProps) {
   const { doctor_name, appointment_date, appointment_time } = appointment;
+
+  /* In edit mode the card is given over to the form entirely — no
+     details, no delete. `SurfaceCard` keeps the row's frame so nothing
+     jumps as it swaps. `onDone` fires on both save and Cancel. */
+  if (editing) {
+    return (
+      <SurfaceCard padding="tight" elevation="card">
+        <AppointmentForm appointment={appointment} onDone={onDoneEdit} />
+      </SurfaceCard>
+    );
+  }
 
   return (
     <SurfaceCard
       padding="tight"
-      elevation={past ? "none" : "card"}
-      className={cn(past && "border border-silver bg-paper/40")}
+      /* A past visit stays a card on the paper field but is plainly set
+         apart from an upcoming one: a greyed paper-deep fill and a flat
+         hairline shadow against the upcoming card's white face and
+         lifted shadow, with quieter text on top — the same muting a
+         stood-down medication gets. It keeps to shadow-and-fill rather
+         than a border, and reads as distinctly muted, not identical. */
+      elevation={past ? "hairline" : "card"}
+      className={past ? "bg-paper-deep" : undefined}
     >
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
         {/* `min-w-0` on the whole chain, or `truncate` below silently
@@ -53,7 +79,10 @@ export function AppointmentRow({
         <div className="flex min-w-0 flex-1 items-center gap-2.5">
           <CalendarDays
             aria-hidden
-            className={cn("size-3.5 shrink-0", past ? "text-silver" : "text-stone")}
+            className={cn(
+              "size-3.5 shrink-0",
+              past ? "text-stone/70" : "text-stone",
+            )}
             strokeWidth={1.5}
           />
 
@@ -88,9 +117,20 @@ export function AppointmentRow({
           <Tag>{statusLabel(appointment.status)}</Tag>
         )}
 
-        {/* There is no cancel: `status` is absent from both appointment
-            schemas, so no endpoint can move a row to `cancelled`. Delete
-            destroys the record, which is why it asks first. */}
+        {/* Edit swaps the whole card for the form; delete destroys the
+            record, which is why only that one asks first. There is still
+            no cancel action — `status` is absent from both appointment
+            schemas, so no endpoint can move a row to `cancelled`. */}
+        <PillButton
+          variant="quiet"
+          size="sm"
+          disabled={deleting}
+          onClick={onEdit}
+          aria-label={`Edit the appointment with ${doctor_name}`}
+        >
+          <Pencil aria-hidden className="size-3.5" strokeWidth={2} />
+        </PillButton>
+
         <PillButton
           variant="quiet"
           size="sm"

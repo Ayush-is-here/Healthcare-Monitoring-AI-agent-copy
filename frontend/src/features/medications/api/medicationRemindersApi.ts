@@ -4,6 +4,7 @@ import {
   medicationReminderSchema,
   type CreateMedicationReminderPayload,
   type MedicationReminder,
+  type UpdateMedicationReminderPayload,
 } from "@/features/medications/types";
 
 /**
@@ -47,6 +48,22 @@ export async function deleteMedicationReminder(
   await http.delete(`/medication-reminders/${reminderId}`);
 }
 
-/* PATCH /medication-reminders/{id} is not wired. Nothing edits a saved
-   time — delete-then-add covers a correction — and the reminder's own
-   `is_active` flag is not exposed in the UI. */
+/**
+ * PATCH /medication-reminders/{id} — answers with the whole row.
+ *
+ * A true PATCH server-side (`exclude_unset`); the caller decides which
+ * keys are sent — see `ReminderTimeEditor`, which sends only
+ * `reminder_time`. The response carries `medication_id`, so the cache
+ * key can be read straight from it. A 404 means the reminder is gone and
+ * a 403 that it is someone else's; both surface.
+ */
+export async function updateMedicationReminder(
+  reminderId: string,
+  patch: UpdateMedicationReminderPayload,
+): Promise<MedicationReminder> {
+  const { data } = await http.patch(
+    `/medication-reminders/${reminderId}`,
+    patch,
+  );
+  return medicationReminderSchema.parse(data);
+}

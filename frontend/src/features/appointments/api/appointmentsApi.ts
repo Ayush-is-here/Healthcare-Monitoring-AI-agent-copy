@@ -4,6 +4,7 @@ import {
   appointmentSchema,
   type Appointment,
   type CreateAppointmentPayload,
+  type UpdateAppointmentPayload,
 } from "@/features/appointments/types";
 
 /**
@@ -37,6 +38,22 @@ export async function createAppointment(
   payload: CreateAppointmentPayload,
 ): Promise<Appointment> {
   const { data } = await http.post("/appointments/", payload);
+  return appointmentSchema.parse(data);
+}
+
+/**
+ * PATCH /appointments/{id} — answers with the whole row.
+ *
+ * A true PATCH server-side (`exclude_unset`), so what a blank optional
+ * means is decided by the payload builder, not this call — see
+ * `toAppointmentUpdatePayload`. A 404 means the appointment does not
+ * exist and a 403 means it is someone else's; both surface.
+ */
+export async function updateAppointment(
+  appointmentId: string,
+  patch: UpdateAppointmentPayload,
+): Promise<Appointment> {
+  const { data } = await http.patch(`/appointments/${appointmentId}`, patch);
   return appointmentSchema.parse(data);
 }
 

@@ -6,6 +6,8 @@ import {
   METRIC_BY_TYPE,
   SYSTOLIC,
   type CreateMetricPayload,
+  type HealthMetric,
+  type UpdateMetricPayload,
 } from "@/features/health-metrics/types";
 
 /**
@@ -171,5 +173,75 @@ export function toMetricPayloads(
       recorded_at,
     },
   ];
+}
+
+/**
+ * Editing one stored reading.
+ *
+ * Only the number and the timestamp. A reading's `metric_type` and
+ * `unit` are fixed once written — see `toMetricUpdatePayload` — so the
+ * type is shown but never a field. A blood-pressure reading is two rows
+ * server-side, each edited on its own here, which is why this works off
+ * a single stored type rather than the picker's `blood_pressure`.
+ */
+export interface MetricEditFormValues {
+  value: string;
+  recorded_at: string;
+}
+
+/**
+ * The edit schema for one metric type.
+ *
+ * Built per row because the value bounds are the stored type's — the
+ * same `checkReading` the log form runs, pointed at the single `value`
+ * field, so a `blood_pressure_systolic` row is held to systolic limits.
+ * `recorded_at` carries the log form's rules verbatim: parseable, and
+ * not in the future.
+ */
+export function makeMetricEditSchema(metricType: string) {
+  return z
+    .object({
+      value: z.string(),
+      recorded_at: z
+        .string()
+        .min(1, "Enter when this was recorded")
+        .refine(
+          (input) => !Number.isNaN(Date.parse(input)),
+          "Enter a valid date and time",
+        )
+        .refine(
+          (input) => new Date(input) <= new Date(),
+          "A reading cannot be in the future",
+        ),
+    })
+    .superRefine((form, ctx) => {
+      checkReading(ctx, "value", form.value, metricType);
+    });
+}
+
+/** A stored reading as edit-form values. */
+export function metricToEditValues(metric: HealthMetric): MetricEditFormValues {
+  return {
+    value: String(metric.value),
+    recorded_at: toDateTimeInputValue(parseRecordedAt(metric.recorded_at)),
+  };
+}
+
+/**
+ * The patch an edit writes.
+ *
+ * Only `value` and `recorded_at` — the two things a correction touches.
+ * `metric_type` and `unit` are deliberately absent: the PATCH is
+ * `exclude_unset`, so leaving them off holds the stored values, which is
+ * exactly right. `recorded_at` goes back naive, the mirror of how the
+ * log form writes it.
+ */
+export function toMetricUpdatePayload(
+  values: MetricEditFormValues,
+): UpdateMetricPayload {
+  return {
+    value: Number(values.value),
+    recorded_at: toNaiveIso(values.recorded_at),
+  };
 }
 

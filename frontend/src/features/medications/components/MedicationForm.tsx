@@ -1,40 +1,78 @@
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 
 import { PillButton } from "@/components/primitives/PillButton";
 import { SelectField } from "@/components/primitives/SelectField";
 import { TextField } from "@/components/primitives/TextField";
+import { UnitSelect } from "@/features/medications/components/UnitSelect";
 import { useCreateMedication } from "@/features/medications/hooks/useCreateMedication";
+import { useUpdateMedication } from "@/features/medications/hooks/useUpdateMedication";
 import {
   emptyMedicationForm,
   medicationFormSchema,
+  medicationToFormValues,
   toMedicationPayload,
+  toMedicationUpdatePayload,
   type MedicationFormValues,
 } from "@/features/medications/medicationFormSchema";
-import { DOSAGE_UNITS, FREQUENCIES } from "@/features/medications/types";
+import { FREQUENCIES, type Medication } from "@/features/medications/types";
+
+export interface MedicationFormProps {
+  /**
+   * When present, the form edits this medication in place instead of
+   * adding a new one: pre-filled, saving through PATCH, with a Cancel.
+   */
+  medication?: Medication;
+  /** Leaves edit mode — called after a successful save or on Cancel. */
+  onDone?: () => void;
+}
 
 /**
- * Adding a medication.
+ * Adding a medication, or editing one.
  *
- * `is_active` is not on the form: `MedicationCreate` forbids extra
- * fields, so sending it is a 422. A new medication is active by
- * definition, and the row can be stood down afterwards.
+ * `is_active` is on neither path: `MedicationCreate` forbids extra fields
+ * so sending it on add is a 422, and on edit the "no longer taking"
+ * toggle owns it (see `MedicationRow`). A new medication is active by
+ * definition, and any row can be stood down from that toggle afterwards.
  */
-export function MedicationForm() {
+export function MedicationForm({ medication, onDone }: MedicationFormProps = {}) {
+  const editing = medication !== undefined;
   const createMedication = useCreateMedication();
+  const updateMedication = useUpdateMedication();
 
   const {
     register,
     handleSubmit,
     reset,
+    control,
     formState: { errors },
   } = useForm<MedicationFormValues>({
     resolver: zodResolver(medicationFormSchema),
-    defaultValues: emptyMedicationForm(),
+    defaultValues: medication
+      ? medicationToFormValues(medication)
+      : emptyMedicationForm(),
   });
 
-  const onSubmit = handleSubmit((values) =>
+  const mutation = editing ? updateMedication : createMedication;
+
+  const onSubmit = handleSubmit((values) => {
+    if (medication) {
+      updateMedication.mutate(
+        {
+          medicationId: medication.id,
+          patch: toMedicationUpdatePayload(values),
+        },
+        {
+          onSuccess: (saved) => {
+            toast.success(`${saved.medicine_name} updated.`);
+            onDone?.();
+          },
+        },
+      );
+      return;
+    }
+
     createMedication.mutate(toMedicationPayload(values), {
       onSuccess: (saved) => {
         /* Cleared completely, unlike the reading form: you rarely add
@@ -42,8 +80,8 @@ export function MedicationForm() {
         reset(emptyMedicationForm());
         toast.success(`${saved.medicine_name} added.`);
       },
-    }),
-  );
+    });
+  });
 
   return (
     <form onSubmit={onSubmit} className="flex flex-col gap-5" noValidate>
@@ -69,13 +107,22 @@ export function MedicationForm() {
           {...register("dosage")}
         />
 
-        <SelectField
-          label="Unit"
-          placeholder="Select…"
-          options={DOSAGE_UNITS}
-          error={errors.dosage_unit?.message ?? null}
-          className="sm:w-36"
-          {...register("dosage_unit")}
+        {/* Its own dropdown, not a native `SelectField`: the open list
+            shows a glyph beside every unit, which a `<select>` can't
+            render. Controlled, so it goes through `Controller`. */}
+        <Controller
+          control={control}
+          name="dosage_unit"
+          render={({ field }) => (
+            <UnitSelect
+              label="Unit"
+              value={field.value}
+              onValueChange={field.onChange}
+              onBlur={field.onBlur}
+              error={errors.dosage_unit?.message ?? null}
+              className="sm:w-36"
+            />
+          )}
         />
       </div>
 
@@ -114,20 +161,42 @@ export function MedicationForm() {
         {...register("instructions")}
       />
 
-      {createMedication.error ? (
+      {mutation.error ? (
         <p role="alert" className="type-body-sm text-critical">
-          {createMedication.error.message}
+          {mutation.error.message}
         </p>
       ) : null}
 
-      <PillButton
-        type="submit"
-        size="lg"
-        disabled={createMedication.isPending}
-        className="w-full sm:w-fit sm:self-start"
-      >
-        {createMedication.isPending ? "Saving…" : "Add medication"}
-      </PillButton>
+      {/* In edit mode the pair sits inline — Cancel leaves without
+          saving and the primary label names the action. On add there is
+          nothing to cancel back to, so the button stands alone. */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <PillButton
+          type="submit"
+          size="lg"
+          disabled={mutation.isPending}
+          className="w-full sm:w-fit"
+        >
+          {mutation.isPending
+            ? "Saving…"
+            : editing
+              ? "Save changes"
+              : "Add medication"}
+        </PillButton>
+
+        {editing ? (
+          <PillButton
+            type="button"
+            variant="ghost"
+            size="lg"
+            disabled={mutation.isPending}
+            onClick={() => onDone?.()}
+            className="w-full sm:w-fit"
+          >
+            Cancel
+          </PillButton>
+        ) : null}
+      </div>
     </form>
   );
 }

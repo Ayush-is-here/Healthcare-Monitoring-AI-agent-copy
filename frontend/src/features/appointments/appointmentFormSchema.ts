@@ -1,6 +1,10 @@
 import { z } from "zod";
 
-import type { CreateAppointmentPayload } from "@/features/appointments/types";
+import type {
+  Appointment,
+  CreateAppointmentPayload,
+  UpdateAppointmentPayload,
+} from "@/features/appointments/types";
 import {
   CLOCK_TIME,
   ISO_DATE,
@@ -120,3 +124,51 @@ export const FIELD_MAX = {
   location: LOCATION_MAX,
   notes: NOTES_MAX,
 } as const;
+
+/**
+ * A stored appointment as form values.
+ *
+ * The date arrives as `YYYY-MM-DD` and goes straight into the `date`
+ * input. The time arrives as `HH:MM:SS` and is trimmed to `HH:MM`, which
+ * is what a `time` input puts back and what `toWholeMinuteTime` pads
+ * again on the way out. The two nullable columns become `""` so a
+ * cleared field is representable in the form.
+ */
+export function appointmentToFormValues(
+  appointment: Appointment,
+): AppointmentFormValues {
+  return {
+    doctor_name: appointment.doctor_name,
+    appointment_date: appointment.appointment_date,
+    appointment_time: appointment.appointment_time.slice(0, 5),
+    purpose: appointment.purpose,
+    location: appointment.location ?? "",
+    notes: appointment.notes ?? "",
+  };
+}
+
+/**
+ * The patch an edit writes.
+ *
+ * The mirror of `toAppointmentPayload`, with one deliberate difference: a
+ * blank optional becomes an explicit `null` rather than `undefined`. The
+ * PATCH is `exclude_unset`, so `undefined` would drop the key and the
+ * old value would survive a clear the patient meant — `null` is what
+ * actually empties a nullable column. Required text is trimmed the same
+ * way, and a `date` and `time` input already yield the wire shapes.
+ */
+export function toAppointmentUpdatePayload(
+  values: AppointmentFormValues,
+): UpdateAppointmentPayload {
+  const location = values.location.trim();
+  const notes = values.notes.trim();
+
+  return {
+    doctor_name: values.doctor_name.trim(),
+    appointment_date: values.appointment_date,
+    appointment_time: toWholeMinuteTime(values.appointment_time),
+    purpose: values.purpose.trim(),
+    location: location.length > 0 ? location : null,
+    notes: notes.length > 0 ? notes : null,
+  };
+}

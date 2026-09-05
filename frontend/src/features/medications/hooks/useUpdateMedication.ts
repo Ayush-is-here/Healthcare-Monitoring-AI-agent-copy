@@ -14,17 +14,18 @@ export interface UpdateMedicationVariables {
 }
 
 /**
- * Patches one medication. Currently only the `is_active` toggle uses it.
+ * Patches one medication — the "no longer taking" toggle and the edit
+ * form both go through here.
  *
  * The response row is spliced into the cached list instead of
  * invalidating it, the same trade `useUpdateProfile` makes: PATCH
  * answers with the whole row, so a refetch would spend a round trip and
- * flash the whole list through a pending state just to move one card
- * between the "currently taking" and "no longer taking" sections.
+ * flash the list through a pending state just to move one card.
  *
- * That shortcut holds only because nothing here can patch `start_date`,
- * which is what the list is sorted by. An edit form would have to
- * invalidate instead.
+ * Splicing is enough even when the edit form changes `start_date` or the
+ * toggle flips `is_active`: `MedicationsView` re-partitions the two
+ * sections and `MedicationList` re-sorts on every render, both from this
+ * cache, so replacing the row re-places its card without a fetch.
  */
 export function useUpdateMedication() {
   const queryClient = useQueryClient();

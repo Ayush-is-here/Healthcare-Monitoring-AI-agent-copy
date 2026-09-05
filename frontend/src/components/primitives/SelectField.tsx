@@ -48,7 +48,7 @@ export function SelectField({
           aria-describedby={message ? messageId : undefined}
           className={cn(
             "type-body-sm h-11 w-full appearance-none rounded-input bg-white",
-            "border border-silver pl-3.5 pr-10 text-graphite",
+            "border border-silver pr-10 pl-3.5 text-graphite",
             "transition-[border-color,box-shadow] duration-200",
             "hover:border-stone/60",
             "focus:border-ink focus:outline-none focus:ring-2 focus:ring-ink/10",

@@ -7,6 +7,9 @@ export interface MedicationListProps {
   /** Which row is open, across every section. `null` means none. */
   expandedId: string | null;
   onExpandedChange: (medicationId: string | null) => void;
+  /** Which row is being edited, across every section. `null` means none. */
+  editingId: string | null;
+  onEditingChange: (medicationId: string | null) => void;
 }
 
 /**
@@ -21,6 +24,8 @@ export function MedicationList({
   medications,
   expandedId,
   onExpandedChange,
+  editingId,
+  onEditingChange,
 }: MedicationListProps) {
   /* The API orders by `start_date DESC` with no tiebreak, so two
      medications started the same day can swap places between refetches.
@@ -48,6 +53,9 @@ export function MedicationList({
                   expandedId === medication.id ? null : medication.id,
                 )
               }
+              editing={editingId === medication.id}
+              onEdit={() => onEditingChange(medication.id)}
+              onDoneEdit={() => onEditingChange(null)}
             />
           </li>
         ))}

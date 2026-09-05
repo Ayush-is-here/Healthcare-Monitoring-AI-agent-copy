@@ -1,6 +1,10 @@
 import { z } from "zod";
 
-import type { CreateMedicationPayload } from "@/features/medications/types";
+import type {
+  CreateMedicationPayload,
+  Medication,
+  UpdateMedicationPayload,
+} from "@/features/medications/types";
 import {
   CLOCK_TIME,
   ISO_DATE,
@@ -114,6 +118,57 @@ export function toMedicationPayload(
     start_date: values.start_date,
     end_date: values.end_date.length > 0 ? values.end_date : undefined,
     instructions: instructions.length > 0 ? instructions : undefined,
+  };
+}
+
+/**
+ * A saved row, as the edit form's fields.
+ *
+ * The API returns `start_date`/`end_date` as `YYYY-MM-DD` already — the
+ * shape a date input wants — so both pass straight through; a missing
+ * `end_date` becomes the empty string the form reads as "no end". The
+ * dose is a number on the row and a string in the field, so it is cast
+ * here and back in `toMedicationUpdatePayload`. The mirror of
+ * `emptyMedicationForm`, for editing rather than adding.
+ */
+export function medicationToFormValues(
+  medication: Medication,
+): MedicationFormValues {
+  return {
+    medicine_name: medication.medicine_name,
+    dosage: String(medication.dosage),
+    dosage_unit: medication.dosage_unit,
+    frequency: medication.frequency,
+    start_date: medication.start_date,
+    end_date: medication.end_date ?? "",
+    instructions: medication.instructions ?? "",
+  };
+}
+
+/**
+ * The keys an edit sends.
+ *
+ * A cleared optional goes as an explicit `null`, not dropped: the PATCH
+ * is `exclude_unset`, so a dropped key leaves the column unchanged, and
+ * clearing a field is meant to empty it. Only `instructions` and
+ * `end_date` are nullable server-side; every other column is NOT NULL
+ * and always carries a value here, so none can reach the database as a
+ * null. `is_active` is absent on purpose — the "no longer taking" toggle
+ * owns that flag, the same reason it is off the add form.
+ */
+export function toMedicationUpdatePayload(
+  values: MedicationFormValues,
+): UpdateMedicationPayload {
+  const instructions = values.instructions.trim();
+
+  return {
+    medicine_name: values.medicine_name.trim(),
+    dosage: Number(values.dosage),
+    dosage_unit: values.dosage_unit,
+    frequency: values.frequency,
+    start_date: values.start_date,
+    end_date: values.end_date.length > 0 ? values.end_date : null,
+    instructions: instructions.length > 0 ? instructions : null,
   };
 }
 
