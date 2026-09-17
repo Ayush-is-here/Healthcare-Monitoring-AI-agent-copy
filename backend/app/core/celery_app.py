@@ -3,6 +3,12 @@ from app.core.config import settings
 from celery.schedules import crontab
 
 
+from urllib.parse import urlparse
+
+print("DEBUG REDIS SCHEME:", repr(urlparse(settings.redis_url).scheme))
+print("DEBUG REDIS HOST:", repr(urlparse(settings.redis_url).hostname))
+print("DEBUG REDIS URL EMPTY:", not bool(settings.redis_url))
+
 celery_app = Celery("healthcare-ai")
 
 celery_app.conf.broker_url = settings.redis_url
