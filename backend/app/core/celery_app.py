@@ -15,6 +15,16 @@ celery_app = Celery("healthcare-ai")
 celery_app.conf.broker_url = settings.redis_url
 celery_app.conf.result_backend = settings.redis_url
 
+
+celery_app.conf.broker_use_ssl = {
+    "ssl_cert_reqs": "CERT_REQUIRED",
+}
+
+celery_app.conf.redis_backend_use_ssl = {
+    "ssl_cert_reqs": "CERT_REQUIRED",
+}
+
+
 celery_app.conf.accept_content = ["json"]
 celery_app.conf.task_serializer = "json"
 celery_app.conf.result_serializer = "json"
