@@ -8,6 +8,7 @@ from urllib.parse import urlparse
 print("DEBUG REDIS SCHEME:", repr(urlparse(settings.redis_url).scheme))
 print("DEBUG REDIS HOST:", repr(urlparse(settings.redis_url).hostname))
 print("DEBUG REDIS URL EMPTY:", not bool(settings.redis_url))
+print("DEBUG REDIS RAW:", repr(settings.redis_url))
 
 celery_app = Celery("healthcare-ai")
 
