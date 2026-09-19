@@ -16,8 +16,8 @@ export interface ProfileFieldsProps {
 }
 
 /**
- * The seven fields `PatientProfileCreate` requires, in one place so
- * onboarding and editing cannot drift apart.
+ * The seven fields `PatientProfileCreate` requires, plus allergies and
+ * chronic_conditions, in one place so onboarding and editing cannot drift apart.
  */
 export function ProfileFields({ register, errors }: ProfileFieldsProps) {
   return (
@@ -80,6 +80,22 @@ export function ProfileFields({ register, errors }: ProfileFieldsProps) {
         options={DRINKING_STATUSES}
         error={errors.drinking_status?.message ?? null}
         {...register("drinking_status")}
+      />
+
+      <TextField
+        label="Allergies"
+        type="text"
+        placeholder="e.g. Penicillin, Peanuts, Shellfish (comma-separated)"
+        error={errors.allergies?.message ?? null}
+        {...register("allergies")}
+      />
+
+      <TextField
+        label="Chronic conditions"
+        type="text"
+        placeholder="e.g. Diabetes, Hypertension (comma-separated)"
+        error={errors.chronic_conditions?.message ?? null}
+        {...register("chronic_conditions")}
       />
     </>
   );

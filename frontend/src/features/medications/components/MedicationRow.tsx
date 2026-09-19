@@ -128,7 +128,7 @@ export function MedicationRow({
       elevation={active ? "card" : "hairline"}
       className={active ? undefined : "bg-paper-deep"}
     >
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-3 sm:gap-y-2">
         {/* The summary itself is the disclosure control. The two action
             buttons are siblings of it, never inside — a button within a
             button is invalid and the inner one stops working. */}
@@ -183,46 +183,53 @@ export function MedicationRow({
           />
         </button>
 
-        <Tag>{frequencyLabel(medication.frequency)}</Tag>
+        <div className="flex flex-wrap items-center gap-2">
+          <Tag>{frequencyLabel(medication.frequency)}</Tag>
 
-        <PillButton
-          variant="quiet"
-          size="sm"
-          disabled={busy}
-          onClick={onToggleActive}
-        >
-          {active ? "No longer taking" : "Taking again"}
-        </PillButton>
+          <PillButton
+            variant="quiet"
+            size="sm"
+            disabled={busy}
+            onClick={onToggleActive}
+          >
+            <span className="hidden sm:inline">
+              {active ? "No longer taking" : "Taking again"}
+            </span>
+            <span className="sm:hidden">
+              {active ? "Stopped" : "Resume"}
+            </span>
+          </PillButton>
 
-        <PillButton
-          variant="quiet"
-          size="sm"
-          disabled={busy}
-          onClick={() => {
-            setConfirming(false);
-            onEdit();
-          }}
-          aria-label={`Edit ${medication.medicine_name}`}
-        >
-          <Pencil aria-hidden className="size-3.5" strokeWidth={2} />
-        </PillButton>
+          <PillButton
+            variant="quiet"
+            size="sm"
+            disabled={busy}
+            onClick={() => {
+              setConfirming(false);
+              onEdit();
+            }}
+            aria-label={`Edit ${medication.medicine_name}`}
+          >
+            <Pencil aria-hidden className="size-3.5" strokeWidth={2} />
+          </PillButton>
 
-        <PillButton
-          variant="quiet"
-          size="sm"
-          disabled={busy}
-          onClick={onDelete}
-          onBlur={() => setConfirming(false)}
-          aria-label={
-            confirming
-              ? `Confirm deleting ${medication.medicine_name}`
-              : `Delete ${medication.medicine_name}`
-          }
-          className={confirming ? "text-critical" : undefined}
-        >
-          <Trash2 aria-hidden className="size-3.5" strokeWidth={2} />
-          {confirming ? "Confirm" : null}
-        </PillButton>
+          <PillButton
+            variant="quiet"
+            size="sm"
+            disabled={busy}
+            onClick={onDelete}
+            onBlur={() => setConfirming(false)}
+            aria-label={
+              confirming
+                ? `Confirm deleting ${medication.medicine_name}`
+                : `Delete ${medication.medicine_name}`
+            }
+            className={confirming ? "text-critical" : undefined}
+          >
+            <Trash2 aria-hidden className="size-3.5" strokeWidth={2} />
+            {confirming ? "Confirm" : null}
+          </PillButton>
+        </div>
       </div>
 
       {medication.instructions ? (

@@ -60,6 +60,8 @@ export interface CreateProfilePayload {
   blood_group: string;
   smoking_status: string;
   drinking_status: string;
+  allergies?: string[];
+  chronic_conditions?: string[];
 }
 
 /**

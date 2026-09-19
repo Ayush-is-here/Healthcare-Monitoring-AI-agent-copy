@@ -47,6 +47,8 @@ export const profileFormSchema = z.object({
   blood_group: z.string().min(1, "Select an option"),
   smoking_status: z.string().min(1, "Select an option"),
   drinking_status: z.string().min(1, "Select an option"),
+  allergies: z.string(),
+  chronic_conditions: z.string(),
 });
 
 export type ProfileFormValues = z.infer<typeof profileFormSchema>;
@@ -59,16 +61,37 @@ export const EMPTY_PROFILE_FORM: ProfileFormValues = {
   blood_group: "",
   smoking_status: "",
   drinking_status: "",
+  allergies: "",
+  chronic_conditions: "",
 };
 
-/** Form strings to wire payload; the measurements are the only cast. */
+/**
+ * Form strings to wire payload; the measurements are the only cast.
+ * Allergies and chronic_conditions are converted from comma-separated strings to arrays.
+ */
 export function toProfilePayload(
   values: ProfileFormValues,
-): CreateProfilePayload {
+): CreateProfilePayload & { allergies?: string[]; chronic_conditions?: string[] } {
+  const allergiesArray = values.allergies
+    .split(',')
+    .map(s => s.trim())
+    .filter(Boolean);
+
+  const chronicConditionsArray = values.chronic_conditions
+    .split(',')
+    .map(s => s.trim())
+    .filter(Boolean);
+
   return {
-    ...values,
+    date_of_birth: values.date_of_birth,
+    gender: values.gender,
     height_cm: Number(values.height_cm),
     weight_kg: Number(values.weight_kg),
+    blood_group: values.blood_group,
+    smoking_status: values.smoking_status,
+    drinking_status: values.drinking_status,
+    ...(allergiesArray.length > 0 && { allergies: allergiesArray }),
+    ...(chronicConditionsArray.length > 0 && { chronic_conditions: chronicConditionsArray }),
   };
 }
 
@@ -77,6 +100,7 @@ export function toProfilePayload(
  *
  * Inputs deal in strings, and `date_of_birth` already arrives as
  * `YYYY-MM-DD`, which is exactly what a date input wants.
+ * Allergies and chronic_conditions are converted from arrays to comma-separated strings.
  */
 export function toProfileFormValues(
   profile: PatientProfile,
@@ -89,6 +113,8 @@ export function toProfileFormValues(
     blood_group: profile.blood_group,
     smoking_status: profile.smoking_status,
     drinking_status: profile.drinking_status,
+    allergies: profile.allergies?.join(', ') ?? '',
+    chronic_conditions: profile.chronic_conditions?.join(', ') ?? '',
   };
 }
 
